@@ -33,7 +33,7 @@ Repository = "https://github.com/btfranklin/agentic-django-example.git"
 requires = ["pdm-backend>=2.0.0"]
 build-backend = "pdm.backend"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "pytest>=9.0.2",
     "pytest-django>=4.11.1",
