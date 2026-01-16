@@ -1,0 +1,19 @@
+{% load sample_app_tags %}
+
+<ul class="agent-conversation">
+  {% for item in items %}
+    {% with item.payload|session_item_context as ctx %}
+      <li class="thread-item thread-item--{{ ctx.kind }}">
+        <div class="thread-item__label">{{ ctx.label }}</div>
+        {% if ctx.meta %}
+          <div class="thread-item__meta">Call ID: {{ ctx.meta }}</div>
+        {% endif %}
+        <div class="thread-item__body{% if ctx.is_code %} thread-item__body--code{% endif %}">
+          {{ ctx.body|safe }}
+        </div>
+      </li>
+    {% endwith %}
+  {% empty %}
+    <li class="agent-conversation__empty">No conversation history yet.</li>
+  {% endfor %}
+</ul>

@@ -1,0 +1,15 @@
+{% extends "sample_app/base.html" %}
+
+{% block content %}
+  <section class="hero">
+    <div class="card">
+      <h2>Log in</h2>
+      <p class="muted">Use your Django credentials, or jump to demo login.</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Log in</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}

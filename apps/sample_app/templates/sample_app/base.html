@@ -1,0 +1,376 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agentic Django Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Space+Grotesk:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="{% static 'sample_app/app.js' %}" defer></script>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f3ed;
+        --bg-accent: #fff6ea;
+        --ink: #1f2933;
+        --muted: #52606d;
+        --card: #ffffff;
+        --border: #e0d8ce;
+        --accent: #0f766e;
+        --accent-strong: #0d5c56;
+        --danger: #b42318;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Space Grotesk", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(1200px 600px at 10% 0%, rgba(255, 190, 120, 0.25), transparent 55%),
+          radial-gradient(900px 700px at 100% 20%, rgba(15, 118, 110, 0.18), transparent 60%),
+          linear-gradient(180deg, var(--bg), var(--bg-accent));
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem clamp(1.5rem, 5vw, 4rem);
+      }
+
+      .brand {
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      nav a {
+        margin-left: 1rem;
+        color: var(--accent-strong);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      main {
+        padding: 0 clamp(1.5rem, 5vw, 4rem) 3rem;
+      }
+
+      .hero {
+        display: grid;
+        gap: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        align-items: start;
+        margin-bottom: 2rem;
+      }
+
+      .input-panel,
+      .response-panel {
+        margin-bottom: 2rem;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 24px;
+        padding: 2rem;
+        border: 1px solid var(--border);
+        box-shadow: 0 30px 60px rgba(31, 41, 51, 0.08);
+      }
+
+      .card h2 {
+        margin-top: 0;
+        font-size: 1.4rem;
+      }
+
+      .muted {
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 0.9rem;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.9rem;
+        resize: vertical;
+      }
+
+      button {
+        margin-top: 1rem;
+        padding: 0.8rem 1.4rem;
+        border-radius: 999px;
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .button--secondary {
+        background: transparent;
+        color: var(--accent-strong);
+        border: 1px solid var(--border);
+      }
+
+      .input-panel__actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .input-panel__actions button {
+        margin-top: 0;
+      }
+
+      .agent-run {
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        padding: 1.5rem;
+        background: #fefcf9;
+      }
+
+      .agent-run__status {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-weight: 600;
+      }
+
+      .agent-run__status--failed {
+        color: var(--danger);
+      }
+
+      .agent-run__spinner {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid rgba(15, 118, 110, 0.2);
+        border-top-color: var(--accent);
+        animation: spin 1s linear infinite;
+      }
+
+      .agent-run__label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 0.5rem;
+      }
+
+      .agent-run__output {
+        font-family: "IBM Plex Mono", monospace;
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 1rem;
+        border-radius: 12px;
+        overflow-x: auto;
+        line-height: 1.55;
+      }
+
+      .agent-run__output pre {
+        margin: 0;
+        white-space: pre-wrap;
+        background: transparent;
+        color: inherit;
+        font-family: inherit;
+      }
+
+      .agent-run__output p {
+        margin: 0 0 0.75rem;
+      }
+
+      .agent-run__output p:last-child {
+        margin-bottom: 0;
+      }
+
+      .agent-run__output ul,
+      .agent-run__output ol {
+        margin: 0.5rem 0 0.5rem 1.25rem;
+        padding: 0;
+      }
+
+      .agent-run__output li {
+        margin-bottom: 0.35rem;
+      }
+
+      .agent-run__output li:last-child {
+        margin-bottom: 0;
+      }
+
+      .conversation-panel {
+        margin-top: 1.5rem;
+      }
+
+      .agent-conversation {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .agent-conversation__empty {
+        color: var(--muted);
+      }
+
+      .thread-item {
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        padding: 1.25rem;
+        background: #fefcf9;
+      }
+
+      .thread-item--user {
+        border-left: 4px solid var(--accent);
+      }
+
+      .thread-item--assistant {
+        border-left: 4px solid #f97316;
+      }
+
+      .thread-item--tool,
+      .thread-item--tool-output {
+        border-left: 4px solid #1d4ed8;
+      }
+
+      .thread-item--reasoning {
+        border-left: 4px solid #f59e0b;
+      }
+
+      .thread-item__label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 0.4rem;
+      }
+
+      .thread-item__meta {
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin-bottom: 0.6rem;
+      }
+
+      .thread-item__body {
+        line-height: 1.6;
+      }
+
+      .thread-item__body p {
+        margin: 0 0 0.75rem;
+      }
+
+      .thread-item__body p:last-child {
+        margin-bottom: 0;
+      }
+
+      .thread-item__body ul,
+      .thread-item__body ol {
+        margin: 0.5rem 0 0.5rem 1.25rem;
+        padding: 0;
+      }
+
+      .thread-item__body li {
+        margin-bottom: 0.35rem;
+      }
+
+      .thread-item__body li:last-child {
+        margin-bottom: 0;
+      }
+
+      .thread-item__body--code {
+        font-family: "IBM Plex Mono", monospace;
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 0.9rem 1rem;
+        border-radius: 12px;
+        overflow-x: auto;
+      }
+
+      .thread-item__body--code pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .thread-item__details {
+        margin-top: 0.75rem;
+      }
+
+      .thread-item__details summary {
+        cursor: pointer;
+        color: var(--accent-strong);
+        font-weight: 600;
+      }
+
+      .thread-item__details pre {
+        margin: 0.6rem 0 0;
+        white-space: pre-wrap;
+        font-family: "IBM Plex Mono", monospace;
+      }
+
+      .demo-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        font-size: 0.85rem;
+        color: var(--muted);
+        background: #fff;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 720px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.8rem;
+        }
+
+        nav a {
+          margin-left: 0;
+          margin-right: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">Agentic Django</div>
+      <nav>
+        {% if request.user.is_authenticated %}
+          <span class="demo-pill">Signed in as {{ request.user.username }}</span>
+          <a href="{% url 'sample_app:logout' %}">Log out</a>
+        {% else %}
+          <a href="{% url 'sample_app:login' %}">Log in</a>
+          <a href="{% url 'sample_app:demo-login' %}">Demo login</a>
+        {% endif %}
+      </nav>
+    </header>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

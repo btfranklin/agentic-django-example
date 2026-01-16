@@ -1,0 +1,7 @@
+{
+  "name": "agentic-django-example",
+  "private": true,
+  "scripts": {
+    "build:css": "echo \"No CSS build configured yet.\""
+  }
+}

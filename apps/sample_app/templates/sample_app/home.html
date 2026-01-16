@@ -1,0 +1,79 @@
+{% extends "sample_app/base.html" %}
+{% load agentic_django_tags %}
+
+{% block content %}
+  <section class="input-panel">
+    <div class="card card--input">
+      <h2>Send a request</h2>
+      <p class="muted">
+        This demo creates a background agent run scoped to your user account. Submit a prompt
+        and watch the run status update with HTMX polling.
+      </p>
+      <form
+        id="agent-form"
+        data-agent-form
+        hx-post="{% url 'agents:run-create' %}"
+        hx-target="#run-container"
+        hx-swap="innerHTML"
+      >
+        {% csrf_token %}
+        <input type="hidden" name="session_key" value="{{ session_key }}" />
+        <textarea name="input" placeholder="Ask the demo agent for travel help..."></textarea>
+      </form>
+      <form id="reset-form" method="post" action="{% url 'sample_app:reset' %}">
+        {% csrf_token %}
+        <input type="hidden" name="session_key" value="{{ session_key }}" />
+      </form>
+      <div class="input-panel__actions">
+        <button type="submit" form="agent-form">Send</button>
+        <button type="submit" form="reset-form" class="button--secondary">Reset</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="response-panel">
+    <div class="card card--response">
+      <h2>Run status</h2>
+      <p class="muted">
+        The run fragment polls every couple of seconds until the workflow completes.
+      </p>
+      <div id="run-container">
+        {% if latest_run %}
+          {% agent_run_fragment latest_run %}
+        {% else %}
+          <div class="agent-run">
+            <div class="agent-run__status">
+              <span>No runs yet. Submit a prompt to start.</span>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card card--response card--conversation">
+      <h2>Conversation</h2>
+      <p class="muted">
+        This thread reflects the server-side session history, including tool calls.
+      </p>
+      <div
+        id="conversation-panel"
+        class="conversation-panel"
+        {% if session %}
+          hx-get="{% url 'agents:session-items' session.session_key %}"
+          hx-trigger="run-update from:body"
+          hx-target="#conversation-contents"
+          hx-swap="innerHTML"
+        {% endif %}
+      >
+        <div id="conversation-contents">
+          {% if session %}
+            {% agent_conversation session %}
+          {% else %}
+            <div class="agent-conversation__empty">No conversation history yet.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}

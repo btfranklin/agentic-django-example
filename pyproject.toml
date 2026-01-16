@@ -1,0 +1,31 @@
+[project]
+name = "agentic-django-example"
+version = "0.1.0"
+description = "Example project for agentic-django."
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "agentic-django[rq]>=0.1.0",
+    "django-rq>=3.0.0",
+    "promptdown>=1.1.6",
+]
+
+[build-system]
+requires = ["pdm-backend>=2.0.0"]
+build-backend = "pdm.backend"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-django>=4.11.1",
+    "ruff>=0.14.10",
+]
+
+[tool.pdm.scripts]
+lint = "ruff check ."
+test = "pytest"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "agentic_django_example.settings"
+python_files = ["test_*.py"]
+pythonpath = ["apps"]
