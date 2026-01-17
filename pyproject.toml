@@ -1,7 +1,7 @@
 [project]
 name = "agentic-django-example"
 version = "0.1.0"
-description = "Example project for agentic-django."
+description = "Demo Django app showcasing the agentic-django library: agent runs, tool calling, HTMX UI, and optional background tasks"
 authors = [
     {name = "B.T. Franklin", email = "brandon.franklin@gmail.com"},
 ]
