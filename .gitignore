@@ -25,6 +25,7 @@ pip-wheel-metadata/
 __pypackages__/
 .pdm-python
 .pdm-build
+output/
 
 # -----------------------------------------------------------------------------
 # Django
