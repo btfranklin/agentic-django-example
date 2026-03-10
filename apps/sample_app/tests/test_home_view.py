@@ -33,6 +33,7 @@ def test_home_creates_session_and_conversation_poll(
     assert f'hx-get="/agents/sessions/{session_key}/items/"' in content
     assert 'hx-trigger="run-update from:body"' in content
     assert 'hx-swap="innerHTML"' in content
+    assert "/static/django_htmx/htmx.min.js" in content
     assert ">Send<" in content
 
 

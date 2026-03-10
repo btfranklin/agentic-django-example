@@ -9,7 +9,8 @@ the [agentic-django PyPI page](https://pypi.org/project/agentic-django/).
 The dependency is wired in `pyproject.toml` as:
 
 ```toml
-agentic-django[rq]>=0.1.0
+agentic-django[rq]>=0.2.0
+django-htmx>=1.27.0
 ```
 
 ## Quick start (Docker)
@@ -77,5 +78,12 @@ pdm run python manage.py rqworker --job-class django_tasks.backends.rq.Job
 - Tool calling: `apps/sample_app/tools.py` defines three `@function_tool` examples (find, price, book) to show tool usage.
 - Agent runs and sessions: `apps/sample_app/views.py` wires per-user `AgentSession` and uses the `agentic_django` run/session models to track history.
 - HTMX run flow: `apps/sample_app/templates/sample_app/home.html` posts to `agents:run-create`, polls `agents:run-fragment`, and refreshes the conversation via `agents:session-items`.
+- HTMX integration wiring: `agentic_django_example/settings.py` enables `django_htmx`, `apps/sample_app/templates/sample_app/base.html` renders `{% htmx_script %}`, and CSP is limited to self-hosted scripts.
 - Conversation rendering: `templates/agentic_django/partials/conversation.html` and `apps/sample_app/templatetags/sample_app_tags.py` format messages, tool calls, and reasoning summaries.
 - Background execution (optional): `agentic_django_example/settings.py` configures `django_tasks` with an RQ backend; `docker-compose.yml` starts Redis + an RQ worker.
+
+## Notes for `agentic-django` 0.2.0
+
+- The library now uses `django-htmx` internally. The example therefore enables `django_htmx` in `INSTALLED_APPS` and `django_htmx.middleware.HtmxMiddleware` in `MIDDLEWARE` so package views can rely on `request.htmx`.
+- HTMX is now served through `django-htmx`'s `{% htmx_script %}` template tag instead of a CDN `<script>` tag. This keeps the demo aligned with Django 6 CSP support and avoids an external `script-src` exception.
+- Run polling now stops server-side with `django_htmx.http.HttpResponseStopPolling` (HTTP `286`) when a run reaches a terminal state. The example test suite covers that behavior.

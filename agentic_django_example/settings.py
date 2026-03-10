@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_htmx",
     "agentic_django.apps.AgenticDjangoConfig",
     "sample_app.apps.SampleAppConfig",
     "django_tasks",
@@ -27,6 +28,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -110,7 +112,7 @@ LOGIN_REDIRECT_URL = "/"
 
 SECURE_CSP = {
     "default-src": "'self'",
-    "script-src": "'self' https://unpkg.com",
+    "script-src": "'self'",
     "style-src": "'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src": "'self' https://fonts.gstatic.com",
     "img-src": "'self' data:",

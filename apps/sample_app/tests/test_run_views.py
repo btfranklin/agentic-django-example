@@ -147,6 +147,32 @@ def test_run_fragment_completed_hides_output(
     assert "done" not in content
 
 
+def test_run_fragment_completed_stops_htmx_polling(
+    client_logged_in: Client,
+    user: AbstractBaseUser,
+) -> None:
+    session = _make_session(user, "session-completed-htmx")
+    run = AgentRun.objects.create(
+        session=session,
+        owner=user,
+        agent_key="demo",
+        status=AgentRun.Status.COMPLETED,
+        input_payload="Hello",
+        final_output={"answer": "done"},
+        task_id="",
+    )
+
+    response = client_logged_in.get(
+        reverse("agents:run-fragment", kwargs={"run_id": run.id}),
+        **{"HTTP_HX_REQUEST": "true"},
+    )
+
+    assert response.status_code == 286
+    content = response.content.decode()
+    assert "Completed" in content
+    assert "hx-get=" not in content
+
+
 def test_run_detail_returns_json(
     client_logged_in: Client,
     user: AbstractBaseUser,
