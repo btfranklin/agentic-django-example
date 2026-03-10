@@ -34,6 +34,8 @@ def test_home_creates_session_and_conversation_poll(
     assert 'hx-trigger="run-update from:body"' in content
     assert 'hx-swap="innerHTML"' in content
     assert "/static/django_htmx/htmx.min.js" in content
+    assert 'rel="icon"' in content
+    assert "/static/sample_app/favicon.svg" in content
     assert ">Send<" in content
 
 
