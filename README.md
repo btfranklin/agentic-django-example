@@ -6,6 +6,10 @@ UI hooks to build LLM-powered Django apps.
 See the [agentic-django GitHub repo](https://github.com/btfranklin/agentic-django) and
 the [agentic-django PyPI page](https://pypi.org/project/agentic-django/).
 
+For repo navigation and maintenance rules, start with `AGENTS.md` and
+`docs/index.md`. The docs directory is the source of truth for architecture,
+operations, quality expectations, and legibility notes.
+
 The dependency is wired in `pyproject.toml` as:
 
 ```toml
@@ -71,6 +75,17 @@ Optional: enable background runs by setting
 ```bash
 pdm run python manage.py rqworker --job-class django_tasks.backends.rq.Job
 ```
+
+## Validation
+
+```bash
+pdm run lint
+pdm run test
+pdm run check
+npm run build:css
+```
+
+`pdm run check` runs the Python lint and test loop together.
 
 ## What this demo shows (and where)
 

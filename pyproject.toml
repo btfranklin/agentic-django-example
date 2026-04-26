@@ -47,6 +47,7 @@ dev = [
 [tool.pdm.scripts]
 lint = "ruff check ."
 test = "pytest"
+check = {composite = ["lint", "test"]}
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "agentic_django_example.settings"
