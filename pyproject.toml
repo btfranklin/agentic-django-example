@@ -20,7 +20,7 @@ classifiers = [
 dependencies = [
     "agentic-django[rq]>=0.2.0",
     "django-htmx>=1.27.0",
-    "django-rq>=3.0.0",
+    "django-rq>=4.1.0",
     "promptdown>=1.1.6",
 ]
 
@@ -34,22 +34,23 @@ Repository = "https://github.com/btfranklin/agentic-django-example.git"
 requires = ["pdm-backend>=2.0.0"]
 build-backend = "pdm.backend"
 
-[tool.pdm.version]
-source = "scm"
-
 [dependency-groups]
 dev = [
-    "pytest>=9.0.2",
-    "pytest-django>=4.11.1",
-    "ruff>=0.14.10",
+    "pytest>=9.1.0",
+    "pytest-django>=4.12.0",
+    "ruff>=0.15.18",
 ]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "agentic_django_example.settings"
+python_files = ["test_*.py"]
+pythonpath = ["apps"]
+
+[tool.pdm.version]
+source = "scm"
 
 [tool.pdm.scripts]
 lint = "ruff check ."
 test = "pytest"
 check = {composite = ["lint", "test"]}
 
-[tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "agentic_django_example.settings"
-python_files = ["test_*.py"]
-pythonpath = ["apps"]
