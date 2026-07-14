@@ -55,8 +55,10 @@ For Python-only changes, `pdm run check` runs lint and tests together.
   `| None` for optional values.
 - Keep Django apps modular. New views, forms, services, tasks, templates, and
   tests should live under the app that owns the workflow.
-- Keep app tests adjacent under `apps/<app>/tests/`. Repo-structure tests may
-  live under top-level `tests/`.
+- Keep application behavior tests adjacent under `apps/<app>/tests/`. Keep
+  documentation governance and project configuration tests in separate modules
+  under top-level `tests/`; they should validate navigability and structured
+  configuration without duplicating application behavior assertions.
 - Follow `<app>/templates/<app>/**` for app templates, and keep package
   overrides under the package template namespace they override.
 - Prefer Django 6's built-in tasks framework for background work. Add Celery
@@ -74,5 +76,5 @@ For Python-only changes, `pdm run check` runs lint and tests together.
 - `docs/` owns architecture, operations, quality, and legibility notes.
 - Update docs in the same change as code when behavior, commands, boundaries,
   or runtime expectations change.
-- The repo legibility tests should fail with remediation text when the docs map
-  drifts.
+- Documentation governance tests should fail with remediation text when the
+  docs map drifts.

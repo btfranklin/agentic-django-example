@@ -5,16 +5,16 @@ package. Keep this file short; durable repo knowledge belongs in `docs/`.
 
 ## Start Here
 
-- `README.md`: quick start and demo overview.
-- `docs/index.md`: documentation map and maintenance rules.
-- `docs/ARCHITECTURE.md`: boundaries, request flow, package integration, and
-  dependency direction.
-- `docs/OPERATIONS.md`: setup, environment variables, runtime modes, and
-  troubleshooting.
-- `docs/QUALITY.md`: validation commands, behavioral contracts, dependency
-  policy, and documentation policy.
-- `docs/LEGIBILITY_AUDIT.md`: current legibility strengths, fixed gaps, and
-  next investments.
+- [README](README.md): quick start and demo overview.
+- [Documentation index](docs/index.md): documentation map and maintenance rules.
+- [Architecture](docs/ARCHITECTURE.md): boundaries, request flow, package
+  integration, and dependency direction.
+- [Operations](docs/OPERATIONS.md): setup, environment variables, runtime modes,
+  and troubleshooting.
+- [Quality](docs/QUALITY.md): validation commands, behavioral contracts,
+  dependency policy, and documentation policy.
+- [Legibility audit](docs/LEGIBILITY_AUDIT.md): current legibility strengths,
+  fixed gaps, and next investments.
 
 ## Working Rules
 
