@@ -18,8 +18,8 @@ classifiers = [
     "Framework :: Django",
 ]
 dependencies = [
-    "agentic-django[rq]>=0.2.0",
-    "django-htmx>=1.27.0",
+    "agentic-django[rq]>=0.2.1",
+    "django-htmx>=1.29.0",
     "django-rq>=4.1.0",
     "promptdown>=1.1.6",
 ]
