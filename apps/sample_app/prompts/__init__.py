@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import lru_cache
+from functools import cache
 from importlib import resources
 
 from promptdown import StructuredPrompt
@@ -8,7 +8,7 @@ from promptdown import StructuredPrompt
 PROMPT_SUFFIX = ".prompt.md"
 
 
-@lru_cache(maxsize=None)
+@cache
 def _promptdown_text(name: str) -> str:
     """Return the raw promptdown text for ``name`` (cached)."""
 

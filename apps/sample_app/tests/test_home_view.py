@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import pytest
+from agentic_django.models import AgentSession, AgentSessionItem
 from django.contrib.auth.models import AbstractBaseUser
 from django.test import Client
-from django.urls import reverse
 from django.test.utils import override_settings
-
-from agentic_django.models import AgentSession, AgentSessionItem
+from django.urls import reverse
 
 pytestmark = pytest.mark.django_db
 

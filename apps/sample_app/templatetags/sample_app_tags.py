@@ -4,11 +4,10 @@ import json
 import re
 from typing import Any
 
+from agentic_django.serializers import _to_jsonable
 from django import template
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
-
-from agentic_django.serializers import _to_jsonable
 
 register = template.Library()
 

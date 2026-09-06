@@ -3,6 +3,9 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
+from agentic_django.models import AgentRun, AgentSession, AgentSessionItem
+from agentic_django.sessions import get_session
+from agentic_django.signals import agent_session_created
 from asgiref.sync import async_to_sync
 from django.conf import settings
 from django.contrib.auth import get_user_model, login
@@ -10,10 +13,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
-
-from agentic_django.models import AgentRun, AgentSession, AgentSessionItem
-from agentic_django.signals import agent_session_created
-from agentic_django.sessions import get_session
 
 
 def demo_login(request: HttpRequest) -> HttpResponse:

@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import pytest
+from agentic_django.models import AgentRun, AgentSession
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
 from django.test import Client
 from django.urls import reverse
-
-from agentic_django.models import AgentRun, AgentSession
 
 pytestmark = pytest.mark.django_db
 
@@ -33,7 +32,7 @@ def test_run_create_htmx_returns_fragment_and_creates_run(
     response = client_logged_in.post(
         reverse("agents:run-create"),
         data={"session_key": session_key, "input": "Hello"},
-        **{"HTTP_HX_REQUEST": "true"},
+        HTTP_HX_REQUEST="true",
     )
 
     assert response.status_code == 200
@@ -164,7 +163,7 @@ def test_run_fragment_completed_stops_htmx_polling(
 
     response = client_logged_in.get(
         reverse("agents:run-fragment", kwargs={"run_id": run.id}),
-        **{"HTTP_HX_REQUEST": "true"},
+        HTTP_HX_REQUEST="true",
     )
 
     assert response.status_code == 286

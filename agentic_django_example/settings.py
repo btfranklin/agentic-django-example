@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import os
-from urllib.parse import urlparse
 from pathlib import Path
+from urllib.parse import urlparse
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

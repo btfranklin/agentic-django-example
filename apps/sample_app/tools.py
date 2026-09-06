@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import random
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 
 from agents.tool import function_tool
@@ -29,7 +29,7 @@ def _parse_date(travel_date: str) -> date:
     try:
         return date.fromisoformat(travel_date)
     except ValueError:
-        return date.today()
+        return datetime.now(UTC).date()
 
 
 def _price_for_flight_number(flight_number: str) -> float:
@@ -88,7 +88,7 @@ def get_flight_price(flight_number: str) -> dict[str, Any]:
         "currency": "USD",
         "amount": amount,
         "fare_basis": "ECO",
-        "last_updated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "last_updated": datetime.now(UTC).isoformat(timespec="seconds"),
     }
 
 
@@ -96,7 +96,7 @@ def get_flight_price(flight_number: str) -> dict[str, Any]:
 def book_flight(flight_number: str) -> dict[str, Any]:
     """Return a mock booking confirmation for a flight number."""
 
-    digest = hashlib.sha256(f"book|{flight_number}".encode("utf-8")).hexdigest()
+    digest = hashlib.sha256(f"book|{flight_number}".encode()).hexdigest()
     booking_id = f"PNR-{digest[:6].upper()}"
     amount = _price_for_flight_number(flight_number)
     return {

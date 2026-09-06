@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import pytest
+from agentic_django.models import AgentSession, AgentSessionItem
 from django.contrib.auth.models import AbstractBaseUser
 from django.test import Client
 from django.urls import reverse
-
-from agentic_django.models import AgentSession, AgentSessionItem
 
 pytestmark = pytest.mark.django_db
 
@@ -32,7 +31,7 @@ def test_session_items_htmx_renders_conversation(
 
     response = client_logged_in.get(
         reverse("agents:session-items", kwargs={"session_key": session.session_key}),
-        **{"HTTP_HX_REQUEST": "true"},
+        HTTP_HX_REQUEST="true",
     )
 
     assert response.status_code == 200
@@ -76,7 +75,7 @@ def test_session_items_formats_reasoning_event(
 
     response = client_logged_in.get(
         reverse("agents:session-items", kwargs={"session_key": session.session_key}),
-        **{"HTTP_HX_REQUEST": "true"},
+        HTTP_HX_REQUEST="true",
     )
 
     assert response.status_code == 200
@@ -98,7 +97,7 @@ def test_session_items_formats_reasoning_summary_details(
 
     response = client_logged_in.get(
         reverse("agents:session-items", kwargs={"session_key": session.session_key}),
-        **{"HTTP_HX_REQUEST": "true"},
+        HTTP_HX_REQUEST="true",
     )
 
     assert response.status_code == 200
