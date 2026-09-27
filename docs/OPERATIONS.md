@@ -34,7 +34,7 @@ sentinel exists in the shared SQLite volume.
 - `DATABASE_URL`: optional PostgreSQL URL. Leave unset for SQLite.
 - `SQLITE_PATH`: optional SQLite database path.
 - `TASKS_BACKEND`: defaults to immediate tasks locally; set
-  `django_tasks.backends.rq.RQBackend` for RQ.
+  `django_tasks_rq.RQBackend` for RQ.
 - `REDIS_URL`: Redis connection string for RQ mode.
 - `OPENAI_API_KEY`: required for real OpenAI-backed agent runs.
 - `OPENAI_DEFAULT_MODEL`: optional model override used by the Agents SDK.
@@ -60,6 +60,6 @@ makes future frontend tooling predictable.
   middleware is enabled, and `{% htmx_script %}` is rendered by
   `apps/sample_app/templates/sample_app/base.html`.
 - If background runs do not progress in Docker, check the `rqworker` container
-  logs and confirm `TASKS_BACKEND=django_tasks.backends.rq.RQBackend`.
+  logs and confirm `TASKS_BACKEND=django_tasks_rq.RQBackend`.
 - If CSP blocks a script, prefer self-hosted static assets and update
   `SECURE_CSP` in settings intentionally.

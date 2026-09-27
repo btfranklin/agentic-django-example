@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "sample_app.apps.SampleAppConfig",
     "django_tasks",
     "django_rq",
+    "django_tasks_rq",
 ]
 
 MIDDLEWARE = [

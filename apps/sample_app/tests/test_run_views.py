@@ -14,7 +14,7 @@ def _patch_enqueue(monkeypatch: pytest.MonkeyPatch) -> None:
     def _noop(_: str) -> None:
         return None
 
-    monkeypatch.setattr("agentic_django.views.enqueue_agent_run", _noop)
+    monkeypatch.setattr("agentic_django.services.enqueue_agent_run", _noop)
 
 
 def _make_session(user: AbstractBaseUser, session_key: str) -> AgentSession:

@@ -13,7 +13,7 @@ operations, quality expectations, and legibility notes.
 The dependency is wired in `pyproject.toml` as:
 
 ```toml
-agentic-django[rq]>=0.3.0
+agentic-django[rq]>=0.4.0
 django-htmx>=1.29.0
 ```
 
@@ -70,10 +70,10 @@ pdm run python manage.py runserver
 Visit `http://localhost:8000/` and use the "Demo login" link.
 
 Optional: enable background runs by setting
-`TASKS_BACKEND=django_tasks.backends.rq.RQBackend` and starting an RQ worker:
+`TASKS_BACKEND=django_tasks_rq.RQBackend` and starting an RQ worker:
 
 ```bash
-pdm run python manage.py rqworker --job-class django_tasks.backends.rq.Job
+pdm run python manage.py rqworker --job-class django_tasks_rq.Job
 ```
 
 ## Validation

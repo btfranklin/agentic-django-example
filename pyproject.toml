@@ -18,7 +18,7 @@ classifiers = [
     "Framework :: Django",
 ]
 dependencies = [
-    "agentic-django[rq]>=0.3.0",
+    "agentic-django[rq]>=0.4.0",
     "django-htmx>=1.29.0",
     "django-rq>=4.2.0",
     "promptdown>=1.1.6",
@@ -31,14 +31,14 @@ Changelog = "https://github.com/btfranklin/agentic-django-example/releases"
 Repository = "https://github.com/btfranklin/agentic-django-example.git"
 
 [build-system]
-requires = ["pdm-backend>=2.0.0"]
+requires = ["pdm-backend>=2.4.10"]
 build-backend = "pdm.backend"
 
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
     "pytest-django>=4.14.0",
-    "ruff>=0.16.6",
+    "ruff>=0.16.9",
     "markdown-it-py>=4.2.0",
     "packaging>=26.3",
 ]

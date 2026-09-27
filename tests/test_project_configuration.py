@@ -52,3 +52,16 @@ def test_agentic_django_dependency_stays_pypi_based() -> None:
         "agentic-django must be consumed from PyPI in this example repo, not "
         "from a local path or direct URL."
     )
+
+
+def test_rq_backend_loads_with_project_settings() -> None:
+    from django.test import override_settings
+    from django_tasks import task_backends
+    from django_tasks_rq import RQBackend
+
+    with override_settings(
+        TASKS={"default": {"BACKEND": "django_tasks_rq.RQBackend"}}
+    ):
+        backend = task_backends["default"]
+        assert isinstance(backend, RQBackend)
+        assert list(backend.check()) == []

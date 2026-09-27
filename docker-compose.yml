@@ -15,7 +15,7 @@ services:
     environment:
       SQLITE_PATH: /data/db.sqlite3
       REDIS_URL: redis://redis:6379/0
-      TASKS_BACKEND: django_tasks.backends.rq.RQBackend
+      TASKS_BACKEND: django_tasks_rq.RQBackend
       DJANGO_DEBUG: "true"
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       OPENAI_DEFAULT_MODEL: ${OPENAI_DEFAULT_MODEL}
@@ -32,11 +32,11 @@ services:
       dockerfile: Dockerfile
     command: >
       sh -c "until [ -f /data/.migrated ]; do sleep 1; done; \
-             pdm run python manage.py rqworker --job-class django_tasks.backends.rq.Job"
+             pdm run python manage.py rqworker --job-class django_tasks_rq.Job"
     environment:
       SQLITE_PATH: /data/db.sqlite3
       REDIS_URL: redis://redis:6379/0
-      TASKS_BACKEND: django_tasks.backends.rq.RQBackend
+      TASKS_BACKEND: django_tasks_rq.RQBackend
       DJANGO_DEBUG: "true"
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       OPENAI_DEFAULT_MODEL: ${OPENAI_DEFAULT_MODEL}
