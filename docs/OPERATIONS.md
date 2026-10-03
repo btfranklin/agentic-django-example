@@ -19,6 +19,10 @@ Set `OPENAI_API_KEY` in `.env` before running live agent requests. Visit
 `http://localhost:8000/` and use the demo login in local debug mode.
 The Log out button submits a POST request and returns to the login page.
 
+For local runs with `DJANGO_DEBUG=false`, use
+`pdm run python manage.py runserver --insecure`. This development server option
+also serves the demo's static files when debug mode is off.
+
 The example environment uses immediate tasks. Local runs need no Redis worker.
 For local background runs, set `TASKS_BACKEND=django_tasks_rq.RQBackend`, keep
 `REDIS_URL=redis://localhost:6379/0`, and start Redis and the RQ worker:
@@ -28,6 +32,9 @@ pdm run python manage.py rqworker --job-class django_tasks_rq.Job
 ```
 
 ## Docker Setup
+
+This Compose stack is for local development. Its Django development server uses
+`--insecure` to serve static files with either debug setting.
 
 ```bash
 cp .env.example .env

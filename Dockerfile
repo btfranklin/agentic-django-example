@@ -13,4 +13,4 @@ WORKDIR /app/agentic-django-example
 
 RUN pdm lock --check && pdm sync --prod --no-self
 
-CMD ["pdm", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["pdm", "run", "python", "manage.py", "runserver", "0.0.0.0:8000", "--insecure"]

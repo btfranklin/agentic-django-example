@@ -38,7 +38,7 @@ services:
 
   web:
     <<: *app
-    command: pdm run python manage.py runserver 0.0.0.0:8000
+    command: pdm run python manage.py runserver 0.0.0.0:8000 --insecure
     ports:
       - "8000:8000"
     depends_on:
