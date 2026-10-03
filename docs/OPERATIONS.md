@@ -17,6 +17,7 @@ pdm run python manage.py runserver
 
 Set `OPENAI_API_KEY` in `.env` before running live agent requests. Visit
 `http://localhost:8000/` and use the demo login in local debug mode.
+The Log out button submits a POST request and returns to the login page.
 
 The example environment uses immediate tasks. Local runs need no Redis worker.
 For local background runs, set `TASKS_BACKEND=django_tasks_rq.RQBackend`, keep

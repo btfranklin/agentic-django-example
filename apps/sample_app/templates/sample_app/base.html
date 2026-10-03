@@ -380,7 +380,10 @@
       <nav>
         {% if request.user.is_authenticated %}
           <span class="demo-pill">Signed in as {{ request.user.username }}</span>
-          <a href="{% url 'sample_app:logout' %}">Log out</a>
+          <form method="post" action="{% url 'sample_app:logout' %}" class="nav-form">
+            {% csrf_token %}
+            <button type="submit" class="nav-button">Log out</button>
+          </form>
         {% else %}
           <a href="{% url 'sample_app:login' %}">Log in</a>
           {% if demo_login_enabled %}
