@@ -54,3 +54,5 @@ def test_compose_passes_app_configuration(tmp_path: Path) -> None:
         )
     for name in ("redis", "rqworker"):
         assert configuration["services"][name]["restart"] == "unless-stopped"
+    redis_volumes = configuration["services"]["redis"]["volumes"]
+    assert any(volume["type"] == "volume" and volume["target"] == "/data" for volume in redis_volumes)

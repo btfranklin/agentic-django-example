@@ -20,6 +20,9 @@ x-app: &app
 services:
   redis:
     image: redis:7
+    command: [redis-server, --appendonly, "yes", --appendfsync, always]
+    volumes:
+      - redis_data:/data
     restart: unless-stopped
     healthcheck:
       test: [CMD, redis-cli, ping]
@@ -56,3 +59,4 @@ services:
 
 volumes:
   sqlite_data:
+  redis_data:

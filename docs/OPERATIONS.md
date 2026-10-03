@@ -42,6 +42,10 @@ persistent readiness file is used.
 Web and worker startup also wait for Redis to pass its health check. Redis and
 the worker restart after an unexpected exit. A manual stop keeps them stopped.
 
+Redis stores queue data in a named volume with append-only persistence. Each
+write is saved to disk. A normal `docker compose down` and `up` keeps both the
+database and queue. `docker compose down --volumes` removes both data volumes.
+
 The Docker build excludes `.env`, local Python environments, Git data, and local
 databases. Compose passes the API key to the containers at run time.
 
@@ -96,5 +100,9 @@ makes future frontend tooling predictable.
   `apps/sample_app/templates/sample_app/base.html`.
 - If background runs do not progress in Docker, check the `rqworker` container
   logs and confirm `TASKS_BACKEND=django_tasks_rq.RQBackend`.
+- If queue data was lost, stop web and worker processes and make sure their old
+  queued tasks cannot run. Mark the affected runs as failed with
+  `pdm run python manage.py agentic_django_recover_runs --mode fail --include-pending`
+  before starting the processes again. Requeueing can repeat tool actions.
 - If CSP blocks a script, prefer self-hosted static assets and update
   `SECURE_CSP` in settings intentionally.
