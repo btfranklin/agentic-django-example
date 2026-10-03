@@ -30,9 +30,8 @@
   browser journey. Add one if UI regressions become common.
 - There is no generated inventory because the repository is still small. Add a
   generated reference only if agents start rediscovering the same file map.
-- The Docker build intentionally refreshes the PDM environment during image
-  build. Revisit this if reproducible image builds become more important than
-  tracking fresh example dependencies.
+- Docker builds use the committed lockfile. The image installs runtime
+  dependencies without the example package or development tools.
 
 ## Next Best Investments
 

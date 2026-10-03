@@ -11,6 +11,6 @@ COPY . /app/agentic-django-example
 
 WORKDIR /app/agentic-django-example
 
-RUN rm -f pdm.lock && pdm install --group dev
+RUN pdm lock --check && pdm sync --prod --no-self
 
 CMD ["pdm", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]

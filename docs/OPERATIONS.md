@@ -40,6 +40,10 @@ sentinel exists in the shared SQLite volume.
 The Docker build excludes `.env`, local Python environments, Git data, and local
 databases. Compose passes the API key to the containers at run time.
 
+The image checks the committed PDM lockfile and installs its runtime packages.
+It does not resolve new versions during the build. The app runs from the copied
+source files, so the build needs no Git data for a package version.
+
 ## Environment Variables
 
 - `DJANGO_SECRET_KEY`: Django secret key. The default is development-only.
