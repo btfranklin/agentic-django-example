@@ -3,6 +3,9 @@
 Use PDM for Python dependency and command management. The app can run locally
 with SQLite or through Docker Compose with Redis and an RQ worker.
 
+Settings load the project root `.env` file for management commands, WSGI, and
+ASGI. Existing process variables take precedence over values in the file.
+
 ## Local Setup
 
 ```bash
