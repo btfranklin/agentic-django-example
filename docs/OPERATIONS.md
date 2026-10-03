@@ -15,6 +15,14 @@ pdm run python manage.py runserver
 Set `OPENAI_API_KEY` in `.env` before running live agent requests. Visit
 `http://localhost:8000/` and use the demo login in local debug mode.
 
+The example environment uses immediate tasks. Local runs need no Redis worker.
+For local background runs, set `TASKS_BACKEND=django_tasks_rq.RQBackend`, keep
+`REDIS_URL=redis://localhost:6379/0`, and start Redis and the RQ worker:
+
+```bash
+pdm run python manage.py rqworker --job-class django_tasks_rq.Job
+```
+
 ## Docker Setup
 
 ```bash
