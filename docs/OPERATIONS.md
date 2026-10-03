@@ -54,6 +54,7 @@ the worker restart after an unexpected exit. A manual stop keeps them stopped.
 Redis stores queue data in a named volume with append-only persistence. Each
 write is saved to disk. A normal `docker compose down` and `up` keeps both the
 database and queue. `docker compose down --volumes` removes both data volumes.
+The stack uses the official Redis 8 image.
 
 The Docker build excludes `.env`, local Python environments, Git data, and local
 databases. Compose passes the API key to the containers at run time.

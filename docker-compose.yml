@@ -19,7 +19,7 @@ x-app: &app
 
 services:
   redis:
-    image: redis:7
+    image: redis:8.10.2
     command: [redis-server, --appendonly, "yes", --appendfsync, always]
     volumes:
       - redis_data:/data
