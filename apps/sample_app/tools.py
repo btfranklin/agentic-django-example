@@ -16,7 +16,7 @@ AIRLINES: list[dict[str, str]] = [
     {"name": "Alaska Airlines", "code": "AS"},
     {"name": "JetBlue", "code": "B6"},
 ]
-FARE_CLASSES = ["Economy", "Premium Economy", "Business", "First"]
+FARE_CLASS = "Economy"
 AIRCRAFT = ["A220", "A320", "A321neo", "B737", "B787-8", "E175"]
 
 
@@ -83,7 +83,7 @@ def find_flight(origin: str, destination: str, travel_date: str) -> list[dict[st
                 "arrive_time": arrive_time.isoformat(timespec="minutes"),
                 "duration_minutes": duration_minutes,
                 "stops": rng.choice([0, 0, 1]),
-                "fare_class": rng.choice(FARE_CLASSES),
+                "fare_class": FARE_CLASS,
                 "seats_left": rng.randint(3, 24),
                 "aircraft": rng.choice(AIRCRAFT),
             }
@@ -100,6 +100,7 @@ def get_flight_price(flight_number: str) -> dict[str, Any]:
         "flight_number": flight_number,
         "currency": "USD",
         "amount": amount,
+        "fare_class": FARE_CLASS,
         "fare_basis": "ECO",
         "last_updated": datetime.now(UTC).isoformat(timespec="seconds"),
     }
@@ -120,7 +121,7 @@ def book_flight(flight_number: str) -> dict[str, Any]:
         "currency": "USD",
         "amount": amount,
         "seat": f"{int(digest[6:8], 16) % 28 + 1}{chr(65 + (int(digest[8:10], 16) % 6))}",
-        "fare_class": "Economy",
+        "fare_class": FARE_CLASS,
         "notes": "Mock booking only; no real reservation was created.",
     }
 

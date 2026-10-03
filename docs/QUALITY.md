@@ -42,8 +42,9 @@ For Python-only changes, `pdm run check` runs lint and tests together.
   invalid dates as tool errors.
 - Prompt instructions live in `*.prompt.md` files and are loaded through
   `promptdown`.
-- Mock tools are deterministic enough for tests and demos; they must not call
-  real booking or pricing services.
+- Mock flight search, price, and booking results use the Economy fare class.
+  Quotes and bookings use the same amount. Mock tools must not call real
+  booking or pricing services.
 
 ## Dependency Policy
 
