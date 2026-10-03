@@ -58,6 +58,9 @@ source files, so the build needs no Git data for a package version.
 - `OPENAI_DEFAULT_MODEL`: optional model override used by the Agents SDK.
 
 The default dependency set includes the Psycopg driver for PostgreSQL.
+Use a `postgres://` or `postgresql://` URL. URL-encode special characters in
+credentials and database names. Query parameters pass PostgreSQL connection
+options such as `sslmode=require` and `connect_timeout=10` to the driver.
 
 ## Validation Commands
 

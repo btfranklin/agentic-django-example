@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import os
+import runpy
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
+from django.core.exceptions import ImproperlyConfigured
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -64,3 +66,37 @@ def test_entrypoints_load_env_file(
         timeout=30,
     )
     assert result.returncode == 0, result.stderr
+
+
+def test_postgres_url_preserves_credentials_and_connection_options(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("PYTHON_DOTENV_DISABLED", "1")
+    monkeypatch.setenv(
+        "DATABASE_URL",
+        "postgresql://demo%40host:p%23ss%3Aword@db:5433/demo%20name"
+        "?sslmode=require&connect_timeout=10&application_name=agentic%20demo",
+    )
+    configuration = runpy.run_path(str(ROOT / "agentic_django_example/settings.py"))
+    database = configuration["DATABASES"]["default"]
+
+    assert database["USER"] == "demo@host"
+    assert database["PASSWORD"] == "p#ss:word"
+    assert database["NAME"] == "demo name"
+    assert database["HOST"] == "db"
+    assert database["PORT"] == 5433
+    assert database["OPTIONS"] == {
+        "sslmode": "require",
+        "connect_timeout": "10",
+        "application_name": "agentic demo",
+    }
+
+
+def test_database_url_rejects_unsupported_database_scheme(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("PYTHON_DOTENV_DISABLED", "1")
+    monkeypatch.setenv("DATABASE_URL", "mysql://user:password@db/example")
+
+    with pytest.raises(ImproperlyConfigured, match="postgres or postgresql"):
+        runpy.run_path(str(ROOT / "agentic_django_example/settings.py"))
