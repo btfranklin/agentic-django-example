@@ -35,6 +35,10 @@ without becoming a fork of the reusable library.
 6. The conversation panel refreshes from `agents:session-items` after
    `run-update` events and renders through the local package partial override.
 
+`sample_app.middleware.AgentLoginMiddleware` handles expired HTMX logins before
+the package views run. It returns HTTP 401 for API requests and HTTP 286 for run
+polls. The form keeps the draft, and the login link returns to the home page.
+
 ## Agent Registry And Prompts
 
 `agentic_django_example.settings.AGENTIC_DJANGO_AGENT_REGISTRY` points to

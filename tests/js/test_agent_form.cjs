@@ -13,6 +13,7 @@ function createFormPage() {
   const listeners = new Map();
   const textarea = { value: "" };
   const error = { textContent: "", hidden: true };
+  const loginAgain = { hidden: true };
   const form = {
     addEventListener(name, listener) {
       listeners.set(name, listener);
@@ -23,7 +24,11 @@ function createFormPage() {
     },
   };
   const document = {
+    addEventListener(name, listener) {
+      listeners.set(`document:${name}`, listener);
+    },
     getElementById(id) {
+      if (id === "login-again") return loginAgain;
       assert.equal(id, "request-error");
       return error;
     },
@@ -38,10 +43,14 @@ function createFormPage() {
     form,
     textarea,
     error,
+    loginAgain,
     dispatch(name, detail) {
       const event = { detail, stopped: false, stopPropagation() { this.stopped = true; } };
       listeners.get(name)(event);
       return event;
+    },
+    dispatchDocument(name, detail) {
+      listeners.get(`document:${name}`)({detail});
     },
   };
 }
@@ -147,6 +156,31 @@ test("network failures show an error and allow a retry", () => {
   page.dispatch("htmx:beforeRequest", { elt: page.form });
   assert.equal(page.error.hidden, true);
   assert.equal(page.error.textContent, "");
+});
+
+test("expired login preserves the draft and provides a login link", () => {
+  const page = createFormPage();
+  page.textarea.value = "keep this request";
+  page.dispatch("htmx:beforeRequest", { elt: page.form });
+  page.dispatch("htmx:beforeOnLoad", {
+    elt: page.form,
+    xhr: { status: 401, responseText: JSON.stringify({error: "Your session has ended."}) },
+  });
+  page.dispatch("htmx:afterRequest", { elt: page.form, successful: false });
+
+  assert.equal(page.textarea.value, "keep this request");
+  assert.equal(page.error.textContent, "Your session has ended.");
+  assert.equal(page.loginAgain.hidden, false);
+});
+
+test("expired conversation refresh shows a login link and keeps a draft", () => {
+  const page = createFormPage();
+  page.textarea.value = "new draft";
+  page.dispatchDocument("htmx:beforeOnLoad", {elt: {}, xhr: {status: 401}});
+
+  assert.equal(page.error.hidden, false);
+  assert.equal(page.loginAgain.hidden, false);
+  assert.equal(page.textarea.value, "new draft");
 });
 
 test("HTML failures and untrusted error text do not replace the document", () => {

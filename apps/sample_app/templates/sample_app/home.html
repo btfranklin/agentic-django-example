@@ -23,6 +23,7 @@
         <textarea id="agent-input" name="input" placeholder="Ask the demo agent for travel help..." required></textarea>
       </form>
       <p id="request-error" class="form-error" role="alert" hidden></p>
+      <a id="login-again" href="{% url 'sample_app:login' %}?next={% url 'sample_app:home' %}" hidden>Sign in again</a>
       <form id="reset-form" method="post" action="{% url 'sample_app:reset' %}">
         {% csrf_token %}
         <input type="hidden" name="session_key" value="{{ session_key }}" />

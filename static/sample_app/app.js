@@ -5,10 +5,12 @@
   if (form && textarea) {
     let submittedValue = null;
     const error = document.getElementById("request-error");
+    const loginAgain = document.getElementById("login-again");
 
-    function showError(message) {
+    function showError(message, loginRequired = false) {
       error.textContent = message;
       error.hidden = false;
+      loginAgain.hidden = !loginRequired;
     }
 
     form.addEventListener("htmx:beforeRequest", (event) => {
@@ -16,6 +18,7 @@
         submittedValue = textarea.value;
         error.textContent = "";
         error.hidden = true;
+        loginAgain.hidden = true;
       }
     });
 
@@ -34,7 +37,13 @@
       } catch {
         // HTML error pages stay in the server logs.
       }
-      showError(message);
+      showError(message, event.detail.xhr.status === 401);
+    });
+
+    document.addEventListener("htmx:beforeOnLoad", (event) => {
+      if (event.detail.elt !== form && event.detail.xhr.status === 401) {
+        showError("Your session has ended. Sign in again before you send a request.", true);
+      }
     });
 
     form.addEventListener("htmx:afterRequest", (event) => {

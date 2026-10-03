@@ -36,6 +36,8 @@ For Python-only changes, `pdm run check` runs lint and tests together.
   status. Empty requests use browser form validation.
 - The request field has a visible label. The run status region announces changes
   without interrupting other screen reader output.
+- An expired HTMX login keeps the unsent request and shows a login link. Run
+  polling stops, and login returns to the home page.
 - Running fragments keep polling; terminal HTMX fragments stop polling with
   HTTP 286.
 - Conversation rendering handles user, assistant, tool call, tool output, and
