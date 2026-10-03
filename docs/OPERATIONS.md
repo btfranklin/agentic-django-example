@@ -53,6 +53,8 @@ databases. Compose passes the API key to the containers at run time.
 - `OPENAI_API_KEY`: required for real OpenAI-backed agent runs.
 - `OPENAI_DEFAULT_MODEL`: optional model override used by the Agents SDK.
 
+The default dependency set includes the Psycopg driver for PostgreSQL.
+
 ## Validation Commands
 
 ```bash
