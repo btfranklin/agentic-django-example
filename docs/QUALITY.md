@@ -26,8 +26,9 @@ For Python-only changes, `pdm run check` runs lint and tests together.
   username.
 - Demo login requires POST with a CSRF token. Its control is visible only in
   debug mode.
-- Resetting a session clears package-backed history and creates a fresh session
-  key.
+- Resetting a session clears backend and local history and creates a fresh
+  session key. It returns HTTP 409 while a run is pending or running and keeps
+  the old key and history.
 - HTMX run creation returns a fragment; non-HTMX run creation returns JSON.
 - The request form clears submitted text only after a successful response and
   only when the user has not changed the text since submission.

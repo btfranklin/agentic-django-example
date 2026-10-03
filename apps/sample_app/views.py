@@ -3,15 +3,17 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
+from agentic_django.async_bridge import run_async
 from agentic_django.models import AgentRun, AgentSession, AgentSessionItem
 from agentic_django.sessions import get_session
 from agentic_django.signals import agent_session_created
-from asgiref.sync import async_to_sync
 from django.conf import settings
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 
@@ -66,14 +68,29 @@ def home(request: HttpRequest) -> HttpResponse:
 def reset_session(request: HttpRequest) -> HttpResponse:
     session_key = request.POST.get("session_key") or request.session.get("agent_session_key")
     if session_key:
-        session = AgentSession.objects.filter(
-            owner=request.user,
-            session_key=session_key,
-        ).first()
-        if session:
-            backend_session = get_session(session_key, request.user)
-            async_to_sync(backend_session.clear_session)()
-            AgentSessionItem.objects.filter(session=session).delete()
+        with transaction.atomic():
+            session_locked = AgentSession.objects.filter(
+                owner=request.user,
+                session_key=session_key,
+            ).update(updated_at=timezone.now())
+            if session_locked:
+                session = AgentSession.objects.select_for_update().get(
+                    owner=request.user,
+                    session_key=session_key,
+                )
+                active_run = AgentRun.objects.filter(
+                    session=session,
+                    status__in=[AgentRun.Status.PENDING, AgentRun.Status.RUNNING],
+                ).exists()
+                if active_run:
+                    return HttpResponse(
+                        "This session cannot be reset while an agent run is active.",
+                        status=409,
+                    )
+
+                backend_session = get_session(session_key, request.user)
+                run_async(backend_session.clear_session)
+                AgentSessionItem.objects.filter(session=session).delete()
     new_session_key = uuid.uuid4().hex
     request.session["agent_session_key"] = new_session_key
     session, created = AgentSession.objects.get_or_create(
