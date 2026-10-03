@@ -12,6 +12,7 @@ const appScript = fs.readFileSync(
 function createFormPage() {
   const listeners = new Map();
   const textarea = { value: "" };
+  const error = { textContent: "", hidden: true };
   const form = {
     addEventListener(name, listener) {
       listeners.set(name, listener);
@@ -22,6 +23,10 @@ function createFormPage() {
     },
   };
   const document = {
+    getElementById(id) {
+      assert.equal(id, "request-error");
+      return error;
+    },
     querySelector(selector) {
       assert.equal(selector, "[data-agent-form]");
       return form;
@@ -32,8 +37,11 @@ function createFormPage() {
   return {
     form,
     textarea,
+    error,
     dispatch(name, detail) {
-      listeners.get(name)({ detail });
+      const event = { detail, stopped: false, stopPropagation() { this.stopped = true; } };
+      listeners.get(name)(event);
+      return event;
     },
   };
 }
@@ -109,4 +117,48 @@ test("login page without the request form is harmless", () => {
   };
 
   assert.doesNotThrow(() => vm.runInNewContext(appScript, { document }));
+});
+
+test("JSON validation errors stay in the form and retain the draft", () => {
+  const page = createFormPage();
+  page.textarea.value = "keep this request";
+  page.dispatch("htmx:beforeRequest", { elt: page.form });
+  const event = page.dispatch("htmx:beforeOnLoad", {
+    elt: page.form,
+    xhr: { status: 400, responseText: '{"error":"input is required"}' },
+  });
+  page.dispatch("htmx:afterRequest", { elt: page.form, successful: false });
+
+  assert.equal(event.stopped, true);
+  assert.equal(page.error.textContent, "input is required");
+  assert.equal(page.error.hidden, false);
+  assert.equal(page.textarea.value, "keep this request");
+});
+
+test("network failures show an error and allow a retry", () => {
+  const page = createFormPage();
+  page.textarea.value = "keep this request";
+  page.dispatch("htmx:beforeRequest", { elt: page.form });
+  page.dispatch("htmx:afterRequest", { elt: page.form });
+
+  assert.equal(page.error.hidden, false);
+  assert.match(page.error.textContent, /did not finish/);
+  assert.equal(page.textarea.value, "keep this request");
+  page.dispatch("htmx:beforeRequest", { elt: page.form });
+  assert.equal(page.error.hidden, true);
+  assert.equal(page.error.textContent, "");
+});
+
+test("HTML failures and untrusted error text do not replace the document", () => {
+  const page = createFormPage();
+  page.dispatch("htmx:beforeOnLoad", {
+    elt: page.form,
+    xhr: { status: 500, responseText: '<script>bad()</script>' },
+  });
+  assert.match(page.error.textContent, /request failed/);
+  page.dispatch("htmx:beforeOnLoad", {
+    elt: page.form,
+    xhr: { status: 400, responseText: JSON.stringify({error: '<script>bad()</script>'}) },
+  });
+  assert.equal(page.error.textContent, '<script>bad()</script>');
 });
