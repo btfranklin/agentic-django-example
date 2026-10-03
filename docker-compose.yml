@@ -1,3 +1,14 @@
+x-app-environment: &app-environment
+  SQLITE_PATH: /data/db.sqlite3
+  DATABASE_URL: ${DATABASE_URL:-}
+  REDIS_URL: redis://redis:6379/0
+  TASKS_BACKEND: django_tasks_rq.RQBackend
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-insecure-key}
+  DJANGO_DEBUG: ${DJANGO_DEBUG:-true}
+  DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  OPENAI_DEFAULT_MODEL: ${OPENAI_DEFAULT_MODEL:-}
+
 services:
   redis:
     image: redis:7
@@ -12,13 +23,7 @@ services:
       sh -c "pdm run python manage.py migrate && \
              touch /data/.migrated && \
              pdm run python manage.py runserver 0.0.0.0:8000"
-    environment:
-      SQLITE_PATH: /data/db.sqlite3
-      REDIS_URL: redis://redis:6379/0
-      TASKS_BACKEND: django_tasks_rq.RQBackend
-      DJANGO_DEBUG: "true"
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      OPENAI_DEFAULT_MODEL: ${OPENAI_DEFAULT_MODEL}
+    environment: *app-environment
     ports:
       - "8000:8000"
     depends_on:
@@ -33,13 +38,7 @@ services:
     command: >
       sh -c "until [ -f /data/.migrated ]; do sleep 1; done; \
              pdm run python manage.py rqworker --job-class django_tasks_rq.Job"
-    environment:
-      SQLITE_PATH: /data/db.sqlite3
-      REDIS_URL: redis://redis:6379/0
-      TASKS_BACKEND: django_tasks_rq.RQBackend
-      DJANGO_DEBUG: "true"
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      OPENAI_DEFAULT_MODEL: ${OPENAI_DEFAULT_MODEL}
+    environment: *app-environment
     depends_on:
       - redis
     volumes:

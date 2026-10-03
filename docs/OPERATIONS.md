@@ -45,6 +45,12 @@ The image checks the committed PDM lockfile and installs its runtime packages.
 It does not resolve new versions during the build. The app runs from the copied
 source files, so the build needs no Git data for a package version.
 
+Compose passes `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`,
+`DATABASE_URL`, and the OpenAI settings from the environment file to each app
+service. Compose selects the RQ backend and its internal Redis address. With no
+`DATABASE_URL`, it uses the shared SQLite volume. A PostgreSQL URL must name a
+host that the containers can reach.
+
 ## Environment Variables
 
 - `DJANGO_SECRET_KEY`: Django secret key. The default is development-only.
