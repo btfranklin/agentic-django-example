@@ -30,7 +30,7 @@ def test_demo_login_rejects_ineligible_existing_user_without_changes(
     )
     password_hash = user.password
 
-    response = client.get(reverse("sample_app:demo-login"))
+    response = client.post(reverse("sample_app:demo-login"))
 
     user.refresh_from_db()
     assert response.status_code == 302
@@ -41,7 +41,7 @@ def test_demo_login_rejects_ineligible_existing_user_without_changes(
 
 @override_settings(DEBUG=True)
 def test_demo_login_creates_user_with_unusable_password(client: Client) -> None:
-    response = client.get(reverse("sample_app:demo-login"))
+    response = client.post(reverse("sample_app:demo-login"))
 
     user = get_user_model().objects.get(username="demo")
     assert response.status_code == 302
@@ -54,7 +54,7 @@ def test_demo_login_creates_user_with_unusable_password(client: Client) -> None:
 def test_demo_login_revokes_existing_usable_password(client: Client) -> None:
     user = get_user_model().objects.create_user(username="demo", password="legacy-password")
 
-    response = client.get(reverse("sample_app:demo-login"))
+    response = client.post(reverse("sample_app:demo-login"))
 
     user.refresh_from_db()
     assert response.status_code == 302
@@ -89,7 +89,7 @@ def test_demo_route_does_not_change_legacy_account_when_disabled(
     password_hash = user.password
 
     with override_settings(DEBUG=False):
-        response = client.get(reverse("sample_app:demo-login"))
+        response = client.post(reverse("sample_app:demo-login"))
 
     user.refresh_from_db()
     assert response.status_code == 302
@@ -107,3 +107,29 @@ def test_normal_user_login_still_works(client: Client) -> None:
     assert response.status_code == 302
     assert response["Location"] == reverse("sample_app:home")
     assert client.session.get("_auth_user_id") == str(user.pk)
+
+
+@override_settings(DEBUG=True)
+def test_demo_login_requires_post_and_csrf() -> None:
+    client = Client(enforce_csrf_checks=True)
+    url = reverse("sample_app:demo-login")
+
+    assert client.get(url).status_code == 405
+    assert client.post(url).status_code == 403
+    assert not get_user_model().objects.filter(username="demo").exists()
+
+    login_page = client.get(reverse("sample_app:login"))
+    assert b'action="/demo-login/"' in login_page.content
+    token = client.cookies["csrftoken"].value
+    response = client.post(url, {"csrfmiddlewaretoken": token})
+
+    assert response.status_code == 302
+    assert client.session.get("_auth_user_id") is not None
+
+
+@override_settings(DEBUG=False)
+def test_disabled_demo_login_has_no_control(client: Client) -> None:
+    response = client.get(reverse("sample_app:login"))
+
+    assert b'action="/demo-login/"' not in response.content
+    assert b"You can also use demo login" not in response.content

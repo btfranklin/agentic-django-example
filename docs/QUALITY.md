@@ -24,6 +24,8 @@ For Python-only changes, `pdm run check` runs lint and tests together.
 - Demo login is available only when `DJANGO_DEBUG=true`. It uses an account
   with no usable password, and ordinary password login rejects the `demo`
   username.
+- Demo login requires POST with a CSRF token. Its control is visible only in
+  debug mode.
 - Resetting a session clears package-backed history and creates a fresh session
   key.
 - HTMX run creation returns a fragment; non-HTMX run creation returns JSON.

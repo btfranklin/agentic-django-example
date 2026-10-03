@@ -40,7 +40,7 @@ def test_home_creates_session_and_conversation_poll(
 
 @override_settings(DEBUG=True)
 def test_demo_login_in_debug_creates_user(client: Client) -> None:
-    response = client.get(reverse("sample_app:demo-login"))
+    response = client.post(reverse("sample_app:demo-login"))
 
     assert response.status_code == 302
     assert response["Location"] == reverse("sample_app:home")
@@ -49,7 +49,7 @@ def test_demo_login_in_debug_creates_user(client: Client) -> None:
 
 @override_settings(DEBUG=False)
 def test_demo_login_redirects_when_not_debug(client: Client) -> None:
-    response = client.get(reverse("sample_app:demo-login"))
+    response = client.post(reverse("sample_app:demo-login"))
 
     assert response.status_code == 302
     assert response["Location"] == reverse("sample_app:login")

@@ -63,6 +63,19 @@
         font-weight: 600;
       }
 
+      .nav-form {
+        display: inline;
+      }
+
+      .nav-button {
+        margin: 0 0 0 1rem;
+        padding: 0;
+        background: transparent;
+        color: var(--accent-strong);
+        font: inherit;
+        font-weight: 600;
+      }
+
       main {
         padding: 0 clamp(1.5rem, 5vw, 4rem) 3rem;
       }
@@ -354,6 +367,10 @@
           margin-left: 0;
           margin-right: 1rem;
         }
+
+        .nav-button {
+          margin-left: 0;
+        }
       }
     </style>
   </head>
@@ -366,7 +383,12 @@
           <a href="{% url 'sample_app:logout' %}">Log out</a>
         {% else %}
           <a href="{% url 'sample_app:login' %}">Log in</a>
-          <a href="{% url 'sample_app:demo-login' %}">Demo login</a>
+          {% if demo_login_enabled %}
+            <form method="post" action="{% url 'sample_app:demo-login' %}" class="nav-form">
+              {% csrf_token %}
+              <button type="submit" class="nav-button">Demo login</button>
+            </form>
+          {% endif %}
         {% endif %}
       </nav>
     </header>

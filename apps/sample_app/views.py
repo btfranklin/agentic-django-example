@@ -15,6 +15,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
 
+@require_POST
 def demo_login(request: HttpRequest) -> HttpResponse:
     if not settings.DEBUG:
         return redirect("sample_app:login")

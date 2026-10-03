@@ -35,7 +35,7 @@ Set `OPENAI_API_KEY` in `.env`. Optionally set `OPENAI_DEFAULT_MODEL`.
 docker compose up --build
 ```
 
-Visit `http://localhost:8000/` and use the "Demo login" link.
+Visit `http://localhost:8000/` and use the "Demo login" button.
 
 ## Quick start (local)
 
@@ -67,7 +67,7 @@ pdm run python manage.py migrate
 pdm run python manage.py runserver
 ```
 
-Visit `http://localhost:8000/` and use the "Demo login" link.
+Visit `http://localhost:8000/` and use the "Demo login" button.
 
 Optional: enable background runs by setting
 `TASKS_BACKEND=django_tasks_rq.RQBackend` and starting an RQ worker:

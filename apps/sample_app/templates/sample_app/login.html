@@ -4,7 +4,9 @@
   <section class="hero">
     <div class="card">
       <h2>Log in</h2>
-      <p class="muted">Use your Django credentials, or jump to demo login.</p>
+      <p class="muted">
+        Use your Django credentials.{% if demo_login_enabled %} You can also use demo login.{% endif %}
+      </p>
       <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
