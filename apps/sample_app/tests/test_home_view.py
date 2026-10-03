@@ -36,6 +36,9 @@ def test_home_creates_session_and_conversation_poll(
     assert 'rel="icon"' in content
     assert "/static/sample_app/favicon.svg" in content
     assert ">Send<" in content
+    assert '<label for="agent-input">Your request</label>' in content
+    assert '<textarea id="agent-input" name="input"' in content
+    assert 'id="run-container" role="status" aria-live="polite" aria-atomic="true"' in content
 
 
 @override_settings(DEBUG=True)

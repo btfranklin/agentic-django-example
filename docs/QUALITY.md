@@ -34,6 +34,8 @@ For Python-only changes, `pdm run check` runs lint and tests together.
   only when the user has not changed the text since submission.
 - Request errors stay next to the form. They keep the draft and the existing run
   status. Empty requests use browser form validation.
+- The request field has a visible label. The run status region announces changes
+  without interrupting other screen reader output.
 - Running fragments keep polling; terminal HTMX fragments stop polling with
   HTTP 286.
 - Conversation rendering handles user, assistant, tool call, tool output, and

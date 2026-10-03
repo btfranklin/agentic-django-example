@@ -19,7 +19,8 @@
       >
         {% csrf_token %}
         <input type="hidden" name="session_key" value="{{ session_key }}" />
-        <textarea name="input" placeholder="Ask the demo agent for travel help..." required></textarea>
+        <label for="agent-input">Your request</label>
+        <textarea id="agent-input" name="input" placeholder="Ask the demo agent for travel help..." required></textarea>
       </form>
       <p id="request-error" class="form-error" role="alert" hidden></p>
       <form id="reset-form" method="post" action="{% url 'sample_app:reset' %}">
@@ -39,7 +40,7 @@
       <p class="muted">
         The run fragment polls every couple of seconds until the workflow completes.
       </p>
-      <div id="run-container">
+      <div id="run-container" role="status" aria-live="polite" aria-atomic="true">
         {% if latest_run %}
           {% agent_run_fragment latest_run %}
         {% else %}
