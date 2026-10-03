@@ -26,6 +26,9 @@ Compose starts Redis, the Django web process, and an RQ worker. The web process
 runs migrations before starting the server. The worker waits until the migration
 sentinel exists in the shared SQLite volume.
 
+The Docker build excludes `.env`, local Python environments, Git data, and local
+databases. Compose passes the API key to the containers at run time.
+
 ## Environment Variables
 
 - `DJANGO_SECRET_KEY`: Django secret key. The default is development-only.
