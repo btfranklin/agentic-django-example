@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
 from django.test import Client
 from django.urls import reverse
+from django.utils.html import escape
 
 pytestmark = pytest.mark.django_db
 
@@ -169,6 +170,33 @@ def test_run_fragment_completed_stops_htmx_polling(
     assert response.status_code == 286
     content = response.content.decode()
     assert "Completed" in content
+    assert "hx-get=" not in content
+
+
+def test_failed_fragment_displays_escaped_reason_and_stops_polling(
+    client_logged_in: Client,
+    user: AbstractBaseUser,
+) -> None:
+    error = 'Incorrect API key. <script>alert("unsafe")</script>'
+    run = AgentRun.objects.create(
+        session=_make_session(user, "session-failed"),
+        owner=user,
+        agent_key="demo",
+        status=AgentRun.Status.FAILED,
+        input_payload="Hello",
+        error=error,
+    )
+
+    response = client_logged_in.get(
+        reverse("agents:run-fragment", kwargs={"run_id": run.id}),
+        HTTP_HX_REQUEST="true",
+    )
+
+    assert response.status_code == 286
+    content = response.content.decode()
+    assert "Failed" in content
+    assert escape(error) in content
+    assert error not in content
     assert "hx-get=" not in content
 
 

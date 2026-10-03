@@ -40,6 +40,7 @@ For Python-only changes, `pdm run check` runs lint and tests together.
   polling stops, and login returns to the home page.
 - Running fragments keep polling; terminal HTMX fragments stop polling with
   HTTP 286.
+- Failed runs show their error text. Templates escape that text before display.
 - Conversation rendering handles user, assistant, tool call, tool output, and
   reasoning events deterministically.
 - Flight search requires `travel_date` in `YYYY-MM-DD` format and reports
