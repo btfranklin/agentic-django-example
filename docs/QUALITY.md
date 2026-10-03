@@ -20,7 +20,9 @@ For Python-only changes, `pdm run check` runs lint and tests together.
 ## Behavioral Contracts
 
 - The home page requires login and creates a user-owned `AgentSession`.
-- Demo login is available only when `DJANGO_DEBUG=true`.
+- Demo login is available only when `DJANGO_DEBUG=true`. It uses an account
+  with no usable password, and ordinary password login rejects the `demo`
+  username.
 - Resetting a session clears package-backed history and creates a fresh session
   key.
 - HTMX run creation returns a fragment; non-HTMX run creation returns JSON.

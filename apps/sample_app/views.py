@@ -21,8 +21,11 @@ def demo_login(request: HttpRequest) -> HttpResponse:
 
     user_model = get_user_model()
     user, created = user_model.objects.get_or_create(username="demo")
-    if created:
-        user.set_password("demo")
+    if not user.is_active or user.is_staff or user.is_superuser:
+        return redirect("sample_app:login")
+
+    if created or user.has_usable_password():
+        user.set_unusable_password()
         user.save(update_fields=["password"])
     login(request, user)
     return redirect("sample_app:home")
