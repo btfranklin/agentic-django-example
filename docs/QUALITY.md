@@ -38,6 +38,8 @@ For Python-only changes, `pdm run check` runs lint and tests together.
   HTTP 286.
 - Conversation rendering handles user, assistant, tool call, tool output, and
   reasoning events deterministically.
+- Flight search requires `travel_date` in `YYYY-MM-DD` format and reports
+  invalid dates as tool errors.
 - Prompt instructions live in `*.prompt.md` files and are loaded through
   `promptdown`.
 - Mock tools are deterministic enough for tests and demos; they must not call

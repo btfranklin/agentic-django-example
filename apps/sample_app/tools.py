@@ -5,7 +5,8 @@ import random
 from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 
-from agents.tool import function_tool
+from agents.run_context import RunContextWrapper
+from agents.tool import default_tool_error_function, function_tool
 
 AIRLINES: list[dict[str, str]] = [
     {"name": "Delta Air Lines", "code": "DL"},
@@ -27,9 +28,12 @@ def _seed_for_route(origin: str, destination: str, travel_date: str) -> int:
 
 def _parse_date(travel_date: str) -> date:
     try:
-        return date.fromisoformat(travel_date)
-    except ValueError:
-        return datetime.now(UTC).date()
+        parsed_date = date.fromisoformat(travel_date)
+    except ValueError as exc:
+        raise ValueError("travel_date must use YYYY-MM-DD.") from exc
+    if parsed_date.isoformat() != travel_date:
+        raise ValueError("travel_date must use YYYY-MM-DD.")
+    return parsed_date
 
 
 def _price_for_flight_number(flight_number: str) -> float:
@@ -38,7 +42,16 @@ def _price_for_flight_number(flight_number: str) -> float:
     return round(base + 24.95, 2)
 
 
-@function_tool
+def _find_flight_error(
+    context: RunContextWrapper[Any],
+    error: Exception,
+) -> str:
+    if isinstance(error, ValueError) and str(error) == "travel_date must use YYYY-MM-DD.":
+        return str(error)
+    return default_tool_error_function(context, error)
+
+
+@function_tool(failure_error_function=_find_flight_error)
 def find_flight(origin: str, destination: str, travel_date: str) -> list[dict[str, Any]]:
     """Return mock flight options for a given route and date."""
 
