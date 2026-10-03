@@ -34,9 +34,10 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Compose starts Redis, the Django web process, and an RQ worker. The web process
-runs migrations before starting the server. The worker waits until the migration
-sentinel exists in the shared SQLite volume.
+Compose starts Redis and runs a separate migration service. The web process and
+RQ worker start only after that service succeeds. The database uses a shared
+SQLite volume. Each `docker compose up` runs the migration service again; no
+persistent readiness file is used.
 
 The Docker build excludes `.env`, local Python environments, Git data, and local
 databases. Compose passes the API key to the containers at run time.

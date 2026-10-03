@@ -9,40 +9,43 @@ x-app-environment: &app-environment
   OPENAI_API_KEY: ${OPENAI_API_KEY:-}
   OPENAI_DEFAULT_MODEL: ${OPENAI_DEFAULT_MODEL:-}
 
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile
+  environment: *app-environment
+  volumes:
+    - sqlite_data:/data
+
 services:
   redis:
     image: redis:7
     ports:
       - "6379:6379"
 
+  migrate:
+    <<: *app
+    command: pdm run python manage.py migrate --noinput
+
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: >
-      sh -c "pdm run python manage.py migrate && \
-             touch /data/.migrated && \
-             pdm run python manage.py runserver 0.0.0.0:8000"
-    environment: *app-environment
+    <<: *app
+    command: pdm run python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
     depends_on:
-      - redis
-    volumes:
-      - sqlite_data:/data
+      redis:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
 
   rqworker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: >
-      sh -c "until [ -f /data/.migrated ]; do sleep 1; done; \
-             pdm run python manage.py rqworker --job-class django_tasks_rq.Job"
-    environment: *app-environment
+    <<: *app
+    command: pdm run python manage.py rqworker --job-class django_tasks_rq.Job
     depends_on:
-      - redis
-    volumes:
-      - sqlite_data:/data
+      redis:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
 
 volumes:
   sqlite_data:
