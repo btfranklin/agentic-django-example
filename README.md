@@ -13,7 +13,7 @@ operations, quality expectations, and legibility notes.
 The dependency is wired in `pyproject.toml` as:
 
 ```toml
-agentic-django[rq]>=0.4.0
+agentic-django[rq]>=0.4.1
 django-htmx>=1.29.0
 ```
 
