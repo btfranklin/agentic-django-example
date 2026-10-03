@@ -3,16 +3,27 @@
   const textarea = form ? form.querySelector("textarea[name='input']") : null;
 
   if (form && textarea) {
-    form.addEventListener("htmx:beforeRequest", () => {
-      form.dataset.lastRequest = textarea.value.trim();
+    let submittedValue = null;
+
+    form.addEventListener("htmx:beforeRequest", (event) => {
+      if (event.detail && event.detail.elt === form) {
+        submittedValue = textarea.value;
+      }
     });
 
     form.addEventListener("htmx:afterRequest", (event) => {
-      if (event.detail && event.detail.failed) {
+      if (
+        !event.detail ||
+        event.detail.elt !== form ||
+        event.detail.successful !== true
+      ) {
         return;
       }
-      textarea.value = "";
-      form.dataset.lastRequest = "";
+
+      if (submittedValue !== null && textarea.value === submittedValue) {
+        textarea.value = "";
+      }
+      submittedValue = null;
     });
   }
 

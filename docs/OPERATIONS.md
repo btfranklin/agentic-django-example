@@ -68,6 +68,7 @@ options such as `sslmode=require` and `connect_timeout=10` to the driver.
 pdm run lint
 pdm run test
 pdm run check
+npm test
 npm run build:css
 ```
 

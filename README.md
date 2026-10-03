@@ -82,6 +82,7 @@ pdm run python manage.py rqworker --job-class django_tasks_rq.Job
 pdm run lint
 pdm run test
 pdm run check
+npm test
 npm run build:css
 ```
 

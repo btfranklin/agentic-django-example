@@ -31,6 +31,7 @@ package. Keep this file short; durable repo knowledge belongs in `docs/`.
 pdm run lint
 pdm run test
 pdm run check
+npm test
 npm run build:css
 ```
 

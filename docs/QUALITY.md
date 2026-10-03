@@ -12,6 +12,7 @@ Run these before handing off meaningful changes:
 ```bash
 pdm run lint
 pdm run test
+npm test
 npm run build:css
 ```
 
@@ -26,6 +27,8 @@ For Python-only changes, `pdm run check` runs lint and tests together.
 - Resetting a session clears package-backed history and creates a fresh session
   key.
 - HTMX run creation returns a fragment; non-HTMX run creation returns JSON.
+- The request form clears submitted text only after a successful response and
+  only when the user has not changed the text since submission.
 - Running fragments keep polling; terminal HTMX fragments stop polling with
   HTTP 286.
 - Conversation rendering handles user, assistant, tool call, tool output, and
