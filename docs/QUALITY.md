@@ -43,6 +43,7 @@ For Python-only changes, `pdm run check` runs lint and tests together.
 - Failed runs show their error text. Templates escape that text before display.
 - Conversation rendering handles user, assistant, tool call, tool output, and
   reasoning events deterministically.
+- Malformed conversation events use escaped text instead of breaking the page.
 - Flight search requires `travel_date` in `YYYY-MM-DD` format and reports
   invalid dates as tool errors.
 - Prompt instructions live in `*.prompt.md` files and are loaded through

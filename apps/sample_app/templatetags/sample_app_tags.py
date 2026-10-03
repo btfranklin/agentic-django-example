@@ -95,7 +95,7 @@ def _format_json_like(value: Any) -> str:
             return ""
         try:
             parsed = json.loads(stripped)
-        except json.JSONDecodeError:
+        except (ValueError, RecursionError):
             return value
         return json.dumps(parsed, indent=2, sort_keys=True, ensure_ascii=False)
     return json.dumps(_to_jsonable(value), indent=2, sort_keys=True, ensure_ascii=False)
@@ -180,7 +180,8 @@ def session_item_context(value: Any) -> dict[str, Any]:
     if isinstance(jsonable, dict):
         role = jsonable.get("role")
         item_type = jsonable.get("type")
-        if role in {"user", "assistant", "system", "developer"} or item_type == "message":
+        valid_role = isinstance(role, str) and role in {"user", "assistant", "system", "developer"}
+        if valid_role or (item_type == "message" and role is None):
             text = _extract_content_text(jsonable.get("content"))
             label = (role or "assistant").replace("_", " ").title()
             context.update(

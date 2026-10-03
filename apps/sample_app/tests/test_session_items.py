@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 from agentic_django.models import AgentSession, AgentSessionItem
 from django.contrib.auth.models import AbstractBaseUser
@@ -105,3 +107,52 @@ def test_session_items_formats_reasoning_summary_details(
     assert "Thought for a moment" in content
     assert "<details" in content
     assert "Used the map API." in content
+
+
+@pytest.mark.parametrize("role", [["user"], {"name": "user"}, 42])
+def test_malformed_roles_render_as_escaped_events(
+    client_logged_in: Client,
+    user: AbstractBaseUser,
+    role: Any,
+) -> None:
+    session = _make_session(user, "session-malformed-role")
+    AgentSessionItem.objects.create(
+        session=session,
+        sequence=1,
+        payload={"type": "message", "role": role, "content": "<script>unsafe()</script>"},
+    )
+    browser_session = client_logged_in.session
+    browser_session["agent_session_key"] = session.session_key
+    browser_session.save()
+
+    for url, headers in (
+        (reverse("sample_app:home"), {}),
+        (reverse("agents:session-items", kwargs={"session_key": session.session_key}), {"HTTP_HX_REQUEST": "true"}),
+    ):
+        response = client_logged_in.get(url, **headers)
+        assert response.status_code == 200
+        content = response.content.decode()
+        assert "Event" in content
+        assert "&lt;script&gt;unsafe()&lt;/script&gt;" in content
+        assert "<script>unsafe()</script>" not in content
+
+
+def test_tool_arguments_over_integer_limit_keep_their_text(
+    client_logged_in: Client,
+    user: AbstractBaseUser,
+) -> None:
+    session = _make_session(user, "session-large-integer")
+    arguments = "9" * 5000
+    AgentSessionItem.objects.create(
+        session=session,
+        sequence=1,
+        payload={"type": "function_call", "name": "test_tool", "arguments": arguments},
+    )
+
+    response = client_logged_in.get(
+        reverse("agents:session-items", kwargs={"session_key": session.session_key}),
+        HTTP_HX_REQUEST="true",
+    )
+
+    assert response.status_code == 200
+    assert arguments in response.content.decode()
