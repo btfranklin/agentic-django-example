@@ -30,7 +30,7 @@ services:
       timeout: 3s
       retries: 30
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
 
   migrate:
     <<: *app
@@ -40,7 +40,7 @@ services:
     <<: *app
     command: pdm run python manage.py runserver 0.0.0.0:8000 --insecure
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     depends_on:
       redis:
         condition: service_healthy

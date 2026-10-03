@@ -35,6 +35,8 @@ pdm run python manage.py rqworker --job-class django_tasks_rq.Job
 
 This Compose stack is for local development. Its Django development server uses
 `--insecure` to serve static files with either debug setting.
+Web and Redis ports bind to `127.0.0.1`. The browser and optional local worker
+can reach them from this computer.
 
 ```bash
 cp .env.example .env

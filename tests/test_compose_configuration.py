@@ -56,3 +56,5 @@ def test_compose_passes_app_configuration(tmp_path: Path) -> None:
         assert configuration["services"][name]["restart"] == "unless-stopped"
     redis_volumes = configuration["services"]["redis"]["volumes"]
     assert any(volume["type"] == "volume" and volume["target"] == "/data" for volume in redis_volumes)
+    for name in ("web", "redis"):
+        assert all(port["host_ip"] == "127.0.0.1" for port in configuration["services"][name]["ports"])
