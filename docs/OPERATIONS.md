@@ -39,6 +39,9 @@ RQ worker start only after that service succeeds. The database uses a shared
 SQLite volume. Each `docker compose up` runs the migration service again; no
 persistent readiness file is used.
 
+Web and worker startup also wait for Redis to pass its health check. Redis and
+the worker restart after an unexpected exit. A manual stop keeps them stopped.
+
 The Docker build excludes `.env`, local Python environments, Git data, and local
 databases. Compose passes the API key to the containers at run time.
 

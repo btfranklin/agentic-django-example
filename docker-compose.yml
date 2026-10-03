@@ -20,6 +20,12 @@ x-app: &app
 services:
   redis:
     image: redis:7
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      timeout: 3s
+      retries: 30
     ports:
       - "6379:6379"
 
@@ -34,16 +40,17 @@ services:
       - "8000:8000"
     depends_on:
       redis:
-        condition: service_started
+        condition: service_healthy
       migrate:
         condition: service_completed_successfully
 
   rqworker:
     <<: *app
+    restart: unless-stopped
     command: pdm run python manage.py rqworker --job-class django_tasks_rq.Job
     depends_on:
       redis:
-        condition: service_started
+        condition: service_healthy
       migrate:
         condition: service_completed_successfully
 

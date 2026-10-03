@@ -46,6 +46,11 @@ def test_compose_passes_app_configuration(tmp_path: Path) -> None:
         assert environment["TASKS_BACKEND"] == "django_tasks_rq.RQBackend"
         assert environment["REDIS_URL"] == "redis://redis:6379/0"
     for name in ("web", "rqworker"):
+        assert configuration["services"][name]["depends_on"]["redis"]["condition"] == (
+            "service_healthy"
+        )
         assert configuration["services"][name]["depends_on"]["migrate"]["condition"] == (
             "service_completed_successfully"
         )
+    for name in ("redis", "rqworker"):
+        assert configuration["services"][name]["restart"] == "unless-stopped"
