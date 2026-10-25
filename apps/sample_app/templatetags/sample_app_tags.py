@@ -2,14 +2,25 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any
+from typing import TypedDict
 
-from agentic_django.serializers import _to_jsonable
+from agentic_django.serializers import JsonSerializer
+from agentic_django.types import JsonValue
 from django import template
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
+
+class SessionItemContext(TypedDict):
+    kind: str
+    label: str
+    body: str
+    meta: JsonValue
+    is_code: bool
+
+
 register = template.Library()
+_serializer = JsonSerializer()
 
 _BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
 _ITALIC_RE = re.compile(r"\*(.+?)\*")
@@ -17,7 +28,7 @@ _ITALIC_UNDERSCORE_RE = re.compile(r"_(.+?)_")
 
 
 def _format_inline(text: str) -> str:
-    escaped = escape(text)
+    escaped: str = escape(text)
     escaped = _BOLD_RE.sub(r"<strong>\1</strong>", escaped)
     escaped = _ITALIC_RE.sub(r"<em>\1</em>", escaped)
     escaped = _ITALIC_UNDERSCORE_RE.sub(r"<em>\1</em>", escaped)
@@ -51,10 +62,10 @@ def _render_markdown(text: str) -> str:
 
         ul_match = re.match(r"^[-*]\s+(.*)$", stripped)
         ol_match = re.match(r"^\d+\.\s+(.*)$", stripped)
-        if ul_match or ol_match:
+        if match := ul_match or ol_match:
             flush_paragraph()
             list_type = "ul" if ul_match else "ol"
-            item_text = ul_match.group(1) if ul_match else ol_match.group(1)
+            item_text = match.group(1)
             if current_list != list_type:
                 close_list()
                 html_parts.append(f"<{list_type}>")
@@ -70,7 +81,7 @@ def _render_markdown(text: str) -> str:
     return "\n".join(html_parts) if html_parts else "<p></p>"
 
 
-def _extract_content_text(content: Any) -> str:
+def _extract_content_text(content: JsonValue) -> str:
     if isinstance(content, str):
         return content
     if isinstance(content, list):
@@ -88,20 +99,20 @@ def _extract_content_text(content: Any) -> str:
     return str(content) if content is not None else ""
 
 
-def _format_json_like(value: Any) -> str:
+def _format_json_like(value: object) -> str:
     if isinstance(value, str):
         stripped = value.strip()
         if not stripped:
             return ""
         try:
-            parsed = json.loads(stripped)
+            parsed: object = json.loads(stripped)
         except (ValueError, RecursionError):
             return value
         return json.dumps(parsed, indent=2, sort_keys=True, ensure_ascii=False)
-    return json.dumps(_to_jsonable(value), indent=2, sort_keys=True, ensure_ascii=False)
+    return json.dumps(_serializer.serialize(value), indent=2, sort_keys=True, ensure_ascii=False)
 
 
-def _extract_output_text(output: Any) -> str:
+def _extract_output_text(output: JsonValue) -> str:
     if isinstance(output, str):
         return output
     if isinstance(output, list):
@@ -120,7 +131,7 @@ def _extract_output_text(output: Any) -> str:
     return _format_json_like(output)
 
 
-def _extract_summary_text(summary: Any) -> str:
+def _extract_summary_text(summary: JsonValue) -> str:
     if isinstance(summary, str):
         return summary
     if isinstance(summary, list):
@@ -147,8 +158,8 @@ def _extract_summary_text(summary: Any) -> str:
 
 
 @register.filter
-def pretty_json(value: Any) -> str:
-    jsonable = _to_jsonable(value)
+def pretty_json(value: object) -> str:
+    jsonable = _serializer.serialize(value)
     if isinstance(jsonable, str):
         text = jsonable.replace("\\n", "\n")
         return mark_safe(escape(text))
@@ -158,8 +169,8 @@ def pretty_json(value: Any) -> str:
 
 
 @register.filter
-def render_output(value: Any) -> str:
-    jsonable = _to_jsonable(value)
+def render_output(value: object) -> str:
+    jsonable = _serializer.serialize(value)
     if isinstance(jsonable, str):
         return mark_safe(_render_markdown(jsonable))
     payload = json.dumps(jsonable, indent=2, sort_keys=True, ensure_ascii=False)
@@ -168,9 +179,9 @@ def render_output(value: Any) -> str:
 
 
 @register.filter
-def session_item_context(value: Any) -> dict[str, Any]:
-    jsonable = _to_jsonable(value)
-    context = {
+def session_item_context(value: object) -> SessionItemContext:
+    jsonable = _serializer.serialize(value)
+    context: SessionItemContext = {
         "kind": "event",
         "label": "Event",
         "body": "<pre></pre>",
@@ -183,10 +194,11 @@ def session_item_context(value: Any) -> dict[str, Any]:
         valid_role = isinstance(role, str) and role in {"user", "assistant", "system", "developer"}
         if valid_role or (item_type == "message" and role is None):
             text = _extract_content_text(jsonable.get("content"))
-            label = (role or "assistant").replace("_", " ").title()
+            message_role = role if isinstance(role, str) else "assistant"
+            label = message_role.replace("_", " ").title()
             context.update(
                 {
-                    "kind": role or "assistant",
+                    "kind": message_role,
                     "label": label,
                     "body": _render_markdown(text),
                     "meta": "",

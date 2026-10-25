@@ -13,7 +13,7 @@ operations, quality expectations, and legibility notes.
 The dependency is wired in `pyproject.toml` as:
 
 ```toml
-agentic-django[rq]>=0.4.1
+agentic-django[rq]>=0.5.1
 django-htmx>=1.29.0
 ```
 
@@ -80,13 +80,17 @@ pdm run python manage.py rqworker --job-class django_tasks_rq.Job
 
 ```bash
 pdm run lint
+pdm run typecheck
+pdm run docs
 pdm run test
 pdm run check
 npm test
 npm run build:css
 ```
 
-`pdm run check` runs the Python lint and test loop together.
+`pdm run check` runs lint, strict type checks, offline documentation checks, and
+Python tests. Install Perfect Doc 0.1.0 or later on `PATH` before this command.
+See [Quality](docs/QUALITY.md) for setup and type-check rules.
 
 ## What this demo shows (and where)
 

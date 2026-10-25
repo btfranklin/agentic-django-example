@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import random
 from datetime import UTC, date, datetime, time, timedelta
-from typing import Any
+from typing import TypedDict
 
 from agents.run_context import RunContextWrapper
 from agents.tool import default_tool_error_function, function_tool
@@ -18,6 +18,42 @@ AIRLINES: list[dict[str, str]] = [
 ]
 FARE_CLASS = "Economy"
 AIRCRAFT = ["A220", "A320", "A321neo", "B737", "B787-8", "E175"]
+
+
+class FlightOption(TypedDict):
+    flight_number: str
+    airline: str
+    origin: str
+    destination: str
+    date: str
+    depart_time: str
+    arrive_time: str
+    duration_minutes: int
+    stops: int
+    fare_class: str
+    seats_left: int
+    aircraft: str
+
+
+class FlightQuote(TypedDict):
+    flight_number: str
+    currency: str
+    amount: float
+    fare_class: str
+    fare_basis: str
+    last_updated: str
+
+
+class FlightBooking(TypedDict):
+    booking_id: str
+    flight_number: str
+    status: str
+    ticketed: bool
+    currency: str
+    amount: float
+    seat: str
+    fare_class: str
+    notes: str
 
 
 def _seed_for_route(origin: str, destination: str, travel_date: str) -> int:
@@ -43,7 +79,7 @@ def _price_for_flight_number(flight_number: str) -> float:
 
 
 def _find_flight_error(
-    context: RunContextWrapper[Any],
+    context: RunContextWrapper[object],
     error: Exception,
 ) -> str:
     if isinstance(error, ValueError) and str(error) == "travel_date must use YYYY-MM-DD.":
@@ -52,7 +88,7 @@ def _find_flight_error(
 
 
 @function_tool(failure_error_function=_find_flight_error)
-def find_flight(origin: str, destination: str, travel_date: str) -> list[dict[str, Any]]:
+def find_flight(origin: str, destination: str, travel_date: str) -> list[FlightOption]:
     """Return mock flight options for a given route and date."""
 
     seed = _seed_for_route(origin, destination, travel_date)
@@ -61,7 +97,7 @@ def find_flight(origin: str, destination: str, travel_date: str) -> list[dict[st
     depart_day = _parse_date(travel_date)
     base_hour = rng.randint(6, 18)
 
-    flights: list[dict[str, Any]] = []
+    flights: list[FlightOption] = []
     for offset in range(flight_count):
         airline = rng.choice(AIRLINES)
         flight_number = f"{airline['code']}{rng.randint(100, 999)}"
@@ -92,7 +128,7 @@ def find_flight(origin: str, destination: str, travel_date: str) -> list[dict[st
 
 
 @function_tool
-def get_flight_price(flight_number: str) -> dict[str, Any]:
+def get_flight_price(flight_number: str) -> FlightQuote:
     """Return a mock price quote for a flight number."""
 
     amount = _price_for_flight_number(flight_number)
@@ -107,7 +143,7 @@ def get_flight_price(flight_number: str) -> dict[str, Any]:
 
 
 @function_tool
-def book_flight(flight_number: str) -> dict[str, Any]:
+def book_flight(flight_number: str) -> FlightBooking:
     """Return a mock booking confirmation for a flight number."""
 
     digest = hashlib.sha256(f"book|{flight_number}".encode()).hexdigest()

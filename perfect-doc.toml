@@ -1,0 +1,12 @@
+include = ["**/*.md"]
+exclude = [
+    "**/.git/**", "**/.venv/**", "**/.pdm-build/**", "**/.mypy_cache/**",
+    "**/.pytest_cache/**", "**/dist/**", "**/node_modules/**",
+]
+
+[markdown]
+dialect = "gfm"
+anchors = "github"
+
+[network]
+enabled = false

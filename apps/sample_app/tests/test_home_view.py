@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 from agentic_django.models import AgentSession, AgentSessionItem
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import User
 from django.test import Client
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -19,7 +19,7 @@ def test_home_requires_login(client: Client) -> None:
 
 def test_home_creates_session_and_conversation_poll(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
 ) -> None:
     response = client_logged_in.get(reverse("sample_app:home"))
 
@@ -60,7 +60,7 @@ def test_demo_login_redirects_when_not_debug(client: Client) -> None:
 
 def test_reset_session_creates_new_session(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
 ) -> None:
     session_key = "session-to-reset"
     session = AgentSession.objects.create(owner=user, session_key=session_key)

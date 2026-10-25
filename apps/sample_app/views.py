@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any
 
 from agentic_django.async_bridge import run_async
 from agentic_django.models import AgentRun, AgentSession, AgentSessionItem
@@ -10,6 +9,7 @@ from agentic_django.signals import agent_session_created
 from django.conf import settings
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AnonymousUser
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
@@ -36,6 +36,7 @@ def demo_login(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def home(request: HttpRequest) -> HttpResponse:
+    assert not isinstance(request.user, AnonymousUser)
     session_key = request.session.get("agent_session_key")
     if not session_key:
         session_key = uuid.uuid4().hex
@@ -55,7 +56,7 @@ def home(request: HttpRequest) -> HttpResponse:
             .first()
         )
 
-    context: dict[str, Any] = {
+    context: dict[str, object] = {
         "session_key": session_key,
         "latest_run": latest_run,
         "session": session,
@@ -66,6 +67,7 @@ def home(request: HttpRequest) -> HttpResponse:
 @login_required
 @require_POST
 def reset_session(request: HttpRequest) -> HttpResponse:
+    assert not isinstance(request.user, AnonymousUser)
     session_key = request.POST.get("session_key") or request.session.get("agent_session_key")
     if session_key:
         with transaction.atomic():

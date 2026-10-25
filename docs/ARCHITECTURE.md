@@ -43,7 +43,16 @@ polls. The form keeps the draft, and the login link returns to the home page.
 
 `agentic_django_example.settings.AGENTIC_DJANGO_AGENT_REGISTRY` points to
 `sample_app.agent_registry.get_agent_registry`. The registry returns callables
-that build `agents.Agent` instances on demand.
+that build `agents.Agent[object]` instances on demand. The demo uses no custom
+context. Its tools return `TypedDict` results for flight options, price quotes,
+and bookings.
+
+`agentic-django` validates session history against the SDK input schema
+when the backend reads it. Tool results use `function_call_output` items with
+a call ID. Reasoning items include an ID and typed summary entries. Local
+template helpers use the package's `JsonSerializer` and `JsonValue` type for
+serialized data. Version 0.5.1 reads SDK iterators into reusable lists, so both
+JSON and HTMX session history preserve reasoning summaries.
 
 Prompt text belongs in `apps/sample_app/prompts/*.prompt.md` and is loaded with
 `promptdown`. Keep new prompt files external to Python code so prompt behavior

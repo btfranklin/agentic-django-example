@@ -18,7 +18,7 @@ classifiers = [
     "Framework :: Django",
 ]
 dependencies = [
-    "agentic-django[rq]>=0.4.1",
+    "agentic-django[rq]>=0.5.1",
     "django-htmx>=1.29.0",
     "django-rq>=4.2.0",
     "promptdown>=1.1.6",
@@ -43,6 +43,8 @@ dev = [
     "ruff>=0.16.10",
     "markdown-it-py>=4.2.0",
     "packaging>=26.3",
+    "mypy>=2.4.0",
+    "django-stubs>=6.1.2",
 ]
 
 [tool.pytest.ini_options]
@@ -56,4 +58,19 @@ source = "scm"
 [tool.pdm.scripts]
 lint = "ruff check ."
 test = "pytest"
-check = {composite = ["lint", "test"]}
+typecheck = "mypy"
+docs = "perfect-doc check --offline --no-banner"
+check = {composite = ["lint", "typecheck", "docs", "test"]}
+
+[tool.mypy]
+files = ["apps", "agentic_django_example", "tests", "manage.py"]
+mypy_path = "apps"
+plugins = ["mypy_django_plugin.main"]
+strict = true
+disallow_any_explicit = true
+disallow_any_unimported = true
+warn_unreachable = true
+show_error_codes = true
+
+[tool.django-stubs]
+django_settings_module = "agentic_django_example.settings"

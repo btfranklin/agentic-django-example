@@ -11,12 +11,30 @@ Run these before handing off meaningful changes:
 
 ```bash
 pdm run lint
+pdm run typecheck
+pdm run docs
+pdm run check
 pdm run test
 npm test
 npm run build:css
 ```
 
-For Python-only changes, `pdm run check` runs lint and tests together.
+`pdm run check` runs lint, strict type checks, offline documentation checks, and
+Python tests. CI runs these checks and the browser helper tests.
+
+## Strict Type Checks
+
+`pdm run typecheck` runs Mypy with `strict = true` and the Django plugin. It
+checks the sample app, project settings and entry points, and Python tests.
+It also rejects explicit `Any` types, types from missing imports, and unreachable
+code. Keep all checked files in this scope. Do not add broad type-check skips.
+
+- Use `Agent[object]` for the demo agent, which needs no custom context.
+- Use `TypedDict` for flight options, quotes, bookings, and template contexts.
+- Use `object` for unknown values. Check their types before use.
+- Declare `request.htmx` on a request subclass when middleware uses it.
+- Narrow the authenticated user type before calls that require a user model.
+- Use the configured `User` model and typed pytest fixtures in tests.
 
 ## Behavioral Contracts
 
@@ -43,7 +61,8 @@ For Python-only changes, `pdm run check` runs lint and tests together.
 - Failed runs show their error text. Templates escape that text before display.
 - Conversation rendering handles user, assistant, tool call, tool output, and
   reasoning events deterministically.
-- Malformed conversation events use escaped text instead of breaking the page.
+- The local conversation renderer uses escaped text for malformed events.
+  Session backend reads reject records that do not match the SDK input schema.
 - Flight search requires `travel_date` in `YYYY-MM-DD` format and reports
   invalid dates as tool errors.
 - Prompt instructions live in `*.prompt.md` files and are loaded through
@@ -70,7 +89,7 @@ For Python-only changes, `pdm run check` runs lint and tests together.
 ## Coding Conventions
 
 - Use 4-space indentation and type-annotate every function.
-- Prefer built-in generics such as `list[str]` and `dict[str, Any]`, and use
+- Prefer built-in generics such as `list[str]` and `dict[str, object]`, and use
   `| None` for optional values.
 - Keep Django apps modular. New views, forms, services, tasks, templates, and
   tests should live under the app that owns the workflow.
@@ -91,6 +110,11 @@ For Python-only changes, `pdm run check` runs lint and tests together.
 
 ## Documentation Policy
 
+- Install Perfect Doc 0.1.0 or later on `PATH`. On macOS, use
+  `brew install btfranklin/tap/perfect-doc`. CI builds the tagged release with
+  Cargo. Run `pdm run docs` for `perfect-doc check --offline --no-banner`.
+- `perfect-doc.toml` checks Markdown with GFM and GitHub anchors. It excludes
+  environments, build output, and tool caches. Network checks are disabled.
 - `AGENTS.md` is a routing map, not the full source of truth.
 - `docs/` owns architecture, operations, quality, and legibility notes.
 - Update docs in the same change as code when behavior, commands, boundaries,

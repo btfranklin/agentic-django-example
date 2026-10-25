@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from agentic_django.models import AgentRun, AgentSession
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
 from django.utils.html import escape
@@ -18,13 +18,13 @@ def _patch_enqueue(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("agentic_django.services.enqueue_agent_run", _noop)
 
 
-def _make_session(user: AbstractBaseUser, session_key: str) -> AgentSession:
+def _make_session(user: User, session_key: str) -> AgentSession:
     return AgentSession.objects.create(owner=user, session_key=session_key)
 
 
 def test_run_create_htmx_returns_fragment_and_creates_run(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     _patch_enqueue(monkeypatch)
@@ -48,7 +48,7 @@ def test_run_create_htmx_returns_fragment_and_creates_run(
 
 def test_run_create_returns_json_without_htmx(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     _patch_enqueue(monkeypatch)
@@ -99,7 +99,7 @@ def test_run_create_requires_input(
 
 def test_run_fragment_for_running_includes_polling(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
 ) -> None:
     session = _make_session(user, "session-running")
     run = AgentRun.objects.create(
@@ -123,7 +123,7 @@ def test_run_fragment_for_running_includes_polling(
 
 def test_run_fragment_completed_hides_output(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
 ) -> None:
     session = _make_session(user, "session-completed")
     run = AgentRun.objects.create(
@@ -149,7 +149,7 @@ def test_run_fragment_completed_hides_output(
 
 def test_run_fragment_completed_stops_htmx_polling(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
 ) -> None:
     session = _make_session(user, "session-completed-htmx")
     run = AgentRun.objects.create(
@@ -175,7 +175,7 @@ def test_run_fragment_completed_stops_htmx_polling(
 
 def test_failed_fragment_displays_escaped_reason_and_stops_polling(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
 ) -> None:
     error = 'Incorrect API key. <script>alert("unsafe")</script>'
     run = AgentRun.objects.create(
@@ -202,7 +202,7 @@ def test_failed_fragment_displays_escaped_reason_and_stops_polling(
 
 def test_run_detail_returns_json(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
 ) -> None:
     session = _make_session(user, "session-detail")
     run = AgentRun.objects.create(
@@ -226,7 +226,7 @@ def test_run_detail_returns_json(
 
 def test_run_detail_requires_owner(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
 ) -> None:
     session = _make_session(user, "session-owner")
     run = AgentRun.objects.create(

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import pytest
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
 
 pytestmark = pytest.mark.django_db
 
 
-def test_logout_control_uses_csrf_protected_post(user: AbstractBaseUser) -> None:
+def test_logout_control_uses_csrf_protected_post(user: User) -> None:
     client = Client(enforce_csrf_checks=True)
     client.force_login(user)
     url = reverse("sample_app:logout")

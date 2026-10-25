@@ -91,6 +91,8 @@ options such as `sslmode=require` and `connect_timeout=10` to the driver.
 
 ```bash
 pdm run lint
+pdm run typecheck
+pdm run docs
 pdm run test
 pdm run check
 npm test
@@ -98,6 +100,7 @@ npm run build:css
 ```
 
 `pdm run check` is the default full local validation loop for Python changes.
+It requires Perfect Doc on `PATH`. See [Quality](QUALITY.md) for installation.
 `npm run build:css` is currently a placeholder, but keeping the script present
 makes future frontend tooling predictable.
 

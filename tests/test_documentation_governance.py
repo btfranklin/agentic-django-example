@@ -30,7 +30,7 @@ def _resolved_local_links(source: Path) -> set[Path]:
             continue
 
         href = token.attrGet("href")
-        assert href is not None
+        assert isinstance(href, str)
         parsed = urlsplit(href)
         if parsed.scheme or parsed.netloc or not parsed.path:
             continue

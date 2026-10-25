@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Any
-
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from django.utils.deprecation import MiddlewareMixin
 from django_htmx.http import HttpResponseStopPolling
+from django_htmx.middleware import HtmxDetails
+
+
+class HtmxRequest(HttpRequest):
+    htmx: HtmxDetails
 
 
 class AgentLoginMiddleware(MiddlewareMixin):
@@ -14,10 +16,10 @@ class AgentLoginMiddleware(MiddlewareMixin):
 
     def process_view(
         self,
-        request: HttpRequest,
-        view_func: Callable[..., HttpResponse],
-        view_args: tuple[Any, ...],
-        view_kwargs: dict[str, Any],
+        request: HtmxRequest,
+        view_func: object,
+        view_args: tuple[object, ...],
+        view_kwargs: dict[str, object],
     ) -> HttpResponse | None:
         match = request.resolver_match
         if (

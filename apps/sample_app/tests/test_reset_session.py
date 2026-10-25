@@ -1,31 +1,30 @@
 from __future__ import annotations
 
-from typing import Any, ClassVar
+from typing import ClassVar
 
 import pytest
 from agentic_django.conf import get_settings
 from agentic_django.models import AgentRun, AgentSession, AgentSessionItem
+from agentic_django.sessions import DatabaseSession
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
+from pytest_django.fixtures import Settings
 
 pytestmark = pytest.mark.django_db
 
 
-class MockSessionBackend:
+class MockSessionBackend(DatabaseSession):
     cleared_keys: ClassVar[list[str]] = []
 
-    def __init__(self, session_key: str) -> None:
-        self.session_key = session_key
-
-    @classmethod
-    def get_or_create(cls, session_key: str, owner: Any) -> MockSessionBackend:
-        del owner
-        return cls(session_key)
+    def __init__(self, session: AgentSession) -> None:
+        super().__init__(session)
+        self.session_key = session.session_key
 
     async def clear_session(self) -> None:
         self.cleared_keys.append(self.session_key)
+        await super().clear_session()
 
 
 def _set_active_session(client: Client, session_key: str) -> None:
@@ -45,7 +44,7 @@ def _add_history(session: AgentSession) -> AgentSessionItem:
 @pytest.mark.parametrize("status", [AgentRun.Status.PENDING, AgentRun.Status.RUNNING])
 def test_reset_rejects_active_run_and_keeps_key_and_history(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
     status: str,
 ) -> None:
     session_key = f"session-{status}"
@@ -73,7 +72,7 @@ def test_reset_rejects_active_run_and_keeps_key_and_history(
 @pytest.mark.parametrize("status", [AgentRun.Status.COMPLETED, AgentRun.Status.FAILED])
 def test_reset_clears_terminal_session_history_and_rotates_key(
     client_logged_in: Client,
-    user: AbstractBaseUser,
+    user: User,
     status: str,
 ) -> None:
     session_key = f"session-{status}"
@@ -102,14 +101,13 @@ def test_reset_clears_terminal_session_history_and_rotates_key(
 
 def test_reset_clears_configured_backend_and_local_history(
     client_logged_in: Client,
-    user: AbstractBaseUser,
-    settings: Any,
+    user: User,
+    settings: Settings,
 ) -> None:
     MockSessionBackend.cleared_keys.clear()
-    settings.AGENTIC_DJANGO_SESSION_BACKEND = (
-        f"{__name__}.MockSessionBackend"
-    )
-    assert get_settings().session_backend == settings.AGENTIC_DJANGO_SESSION_BACKEND
+    backend_path = f"{__name__}.MockSessionBackend"
+    settings.AGENTIC_DJANGO_SESSION_BACKEND = backend_path
+    assert get_settings().session_backend == backend_path
     session_key = "session-custom-backend"
     _set_active_session(client_logged_in, session_key)
     session = AgentSession.objects.create(owner=user, session_key=session_key)
@@ -179,7 +177,7 @@ def test_reset_does_not_clear_another_owners_session(
     assert client_logged_in.session.get("agent_session_key") != session_key
 
 
-def test_reset_requires_csrf_token(user: AbstractBaseUser) -> None:
+def test_reset_requires_csrf_token(user: User) -> None:
     client = Client(enforce_csrf_checks=True)
     client.force_login(user)
 
